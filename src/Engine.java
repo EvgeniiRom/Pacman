@@ -10,15 +10,34 @@ public class Engine {
 
     private Map<String, IWorldObject> worldObjectsMap = new HashMap<>();
 
+    public void addWorldObject(String id, IWorldObject object) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (worldObjectsMap) {
+                    worldObjectsMap.put(id, object);
+                }
+            }
+        }).start();
+    }
 
-    public void addWorldObject(String id, IWorldObject object){
-        worldObjectsMap.put(id, object);
+    public void removeWorldObject(String id) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (worldObjectsMap) {
+                    worldObjectsMap.remove(id);
+                }
+            }
+        }).start();
     }
 
     private synchronized void worldTick(long time) {
-        Collection<IWorldObject> worldObjects = worldObjectsMap.values();
-        for (IWorldObject iWorldObject : worldObjects) {
-            iWorldObject.update(time);
+        synchronized (worldObjectsMap) {
+            Collection<IWorldObject> worldObjects = worldObjectsMap.values();
+            for (IWorldObject iWorldObject : worldObjects) {
+                iWorldObject.update(time);
+            }
         }
     }
 
@@ -47,8 +66,7 @@ public class Engine {
                     }
                 } catch (InterruptedException e) {
                     logger.info("engine update thread was interrupted");
-                }
-                finally {
+                } finally {
                     started = false;
                     stopped = true;
                 }

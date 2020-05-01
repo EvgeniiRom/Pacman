@@ -13,7 +13,25 @@ public class Renderer {
     }
 
     public void addRenderObject(String id, IRenderObject renderObject){
-        renderObjectMap.put(id, renderObject);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (renderObjectMap){
+                    renderObjectMap.put(id, renderObject);
+                }
+            }
+        }).start();
+    }
+
+    public void removeRenderObject(String id){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (renderObjectMap){
+                    renderObjectMap.remove(id);
+                }
+            }
+        }).start();
     }
 
     public void render(Graphics2D g, Dimension size){
@@ -27,9 +45,11 @@ public class Renderer {
         AffineTransform transform = g.getTransform();
         g.scale(xScale, yScale);
         renderField(g, pacField.getField());
-        Collection<IRenderObject> renderObjectArray = renderObjectMap.values();
-        for (IRenderObject renderObject : renderObjectArray) {
-            renderObject.render(g);
+        synchronized (renderObjectMap) {
+            Collection<IRenderObject> renderObjectArray = renderObjectMap.values();
+            for (IRenderObject renderObject : renderObjectArray) {
+                renderObject.render(g);
+            }
         }
         g.setTransform(transform);
     }

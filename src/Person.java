@@ -18,6 +18,10 @@ public class Person implements IWorldObject, IRenderObject {
         this.pacContext = pacContext;
     }
 
+    public Coord<Double> getCurrentCoord() {
+        return currentCoord;
+    }
+
     public enum Dir {
         NONE,
         UP,

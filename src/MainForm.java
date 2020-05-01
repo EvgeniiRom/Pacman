@@ -11,7 +11,6 @@ public class MainForm extends JFrame {
     private GamePanel gamePanel;
 
     private PacContext pacContext;
-    private Person player;
     private Logger logger = Logger.getLogger(MainForm.class.getName());
 
     public static void main(String[] args) throws IOException {
@@ -39,9 +38,7 @@ public class MainForm extends JFrame {
             }
         });
         pacContext = new PacContext();
-        player = new Person(pacContext);
-        pacContext.getEngine().addWorldObject("player", player);
-        pacContext.getRenderer().addRenderObject("player", player);
+
         registerKeyboard();
 
         gamePanel = new GamePanel(pacContext);
@@ -101,19 +98,19 @@ public class MainForm extends JFrame {
 
     private void onUp(){
         logger.info("up");
-        player.setPreferredDir(Person.Dir.UP);
+        pacContext.getPlayer().setPreferredDir(Person.Dir.UP);
     }
     private void onDown(){
         logger.info("down");
-        player.setPreferredDir(Person.Dir.DOWN);
+        pacContext.getPlayer().setPreferredDir(Person.Dir.DOWN);
     }
     private void onLeft(){
         logger.info("left");
-        player.setPreferredDir(Person.Dir.LEFT);
+        pacContext.getPlayer().setPreferredDir(Person.Dir.LEFT);
     }
     private void onRight(){
         logger.info("right");
-        player.setPreferredDir(Person.Dir.RIGHT);
+        pacContext.getPlayer().setPreferredDir(Person.Dir.RIGHT);
     }
     private void onStart() {
         logger.info("start");
