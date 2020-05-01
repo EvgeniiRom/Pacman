@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class FieldReader {
+public class PacField {
     private int width = 0;
     private int height = 0;
     private int[][] field = new int[0][0];

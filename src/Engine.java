@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -62,7 +63,7 @@ public class Engine {
                 started = false;
                 try {
                     while (!stopped) {
-                        wait(1);
+                        Thread.sleep(1);
                     }
                     Collection<IWorldObject> worldObjects = worldObjectsMap.values();
                     for (IWorldObject iWorldObject : worldObjects) {

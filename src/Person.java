@@ -1,15 +1,22 @@
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 
-public class Person implements IWorldObject{
+public class Person implements IWorldObject, IRenderObject{
     private Coord<Double> coord = new Coord<>(15d,0d);
     private int w = 10;
     private int h = 10;
 
-    private double xV = 10f;
+    private double xV = 0f;
     private double yV = 0f;
 
+    public enum Dir{
+        UP,
+        RIGHT,
+        DOWN,
+        LEFT;
+    }
 
+    @Override
     public void render(Graphics2D g){
         g.setColor(Color.RED);
         AffineTransform transform = g.getTransform();
@@ -34,5 +41,24 @@ public class Person implements IWorldObject{
     @Override
     public void finish() {
 
+    }
+
+    public void setPreferredDir(Dir dir){
+        xV = 0f;
+        yV = 0f;
+        switch (dir) {
+            case UP:
+                yV = -10f;
+                break;
+            case RIGHT:
+                xV = 10f;
+                break;
+            case DOWN:
+                yV = 10f;
+                break;
+            case LEFT:
+                xV = -10f;
+                break;
+        }
     }
 }
