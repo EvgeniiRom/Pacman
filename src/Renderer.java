@@ -1,7 +1,7 @@
 import java.awt.*;
 
-public class FieldRenderer {
-    public static void renderField(Graphics2D g, double blockWidth, double blockHeight, int[][] field) {
+public class Renderer {
+    public static void renderField(Graphics2D g, int blockWidth, int blockHeight, int[][] field) {
         int rowCount = field.length;
         for (int i = 0; i < rowCount; i++) {
             int[] row = field[i];
@@ -14,7 +14,7 @@ public class FieldRenderer {
                 if (block == 1) {
                     g.setColor(new Color(0, 0, 0));
                 }
-                g.fillRect((int)(blockWidth*j), (int)(blockHeight*i), (int) blockWidth+1, (int) blockHeight+1);
+                g.fillRect(blockWidth*j, blockHeight*i, blockWidth, blockHeight);
             }
         }
     }
