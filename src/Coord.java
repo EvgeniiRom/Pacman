@@ -22,4 +22,8 @@ public class Coord<T> {
     public void setY(T y) {
         this.y = y;
     }
+
+    public Coord clone(){
+        return new Coord<T>(x, y);
+    }
 }

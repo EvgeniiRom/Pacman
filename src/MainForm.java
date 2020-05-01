@@ -53,7 +53,7 @@ public class MainForm extends JFrame {
             public void run() {
                 try {
                     while (true) {
-                        Thread.sleep(1);
+                        Thread.sleep(10);
                         gamePanel.repaint();
                     }
                 } catch (InterruptedException e) {
