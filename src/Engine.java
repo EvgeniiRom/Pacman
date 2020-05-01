@@ -3,7 +3,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class Engine {
-    private int worldUpdateDelay;
+    private int worldUpdateDelay = 10;
     private boolean started = false;
     private boolean stopped = true;
     private Logger logger = Logger.getLogger(Engine.class.getName());

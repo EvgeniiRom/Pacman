@@ -107,9 +107,18 @@ public class Person implements IWorldObject, IRenderObject {
         }
     }
 
+    private void correctPosition(){
+        int blockSize = pacContext.getBlockSize();
+        coord.x = (double)(int)(coord.x/blockSize)*blockSize + blockSize/2;
+        coord.y = (double)(int)(coord.y/blockSize)*blockSize + blockSize/2;
+    }
+
     @Override
     public void update(long time) {
         if(dir==Dir.NONE||crossCenter(time)){
+            if(dir!=preferredDir){
+                correctPosition();
+            }
             dir = preferredDir;
             updateVelocity();
             if(getNextBlock(dir)==1){
