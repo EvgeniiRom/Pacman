@@ -7,7 +7,6 @@ import java.util.Map;
 public class Renderer {
     private PacContext pacContext;
     private Map<String, IRenderObject> renderObjectMap = new HashMap<>();
-    private final int BLOCK_SIZE = 10;
 
     public Renderer(PacContext pacContext) {
         this.pacContext = pacContext;
@@ -18,11 +17,12 @@ public class Renderer {
     }
 
     public void render(Graphics2D g, Dimension size){
+        int blockSize = pacContext.getBlockSize();
         PacField pacField = pacContext.getPacField();
         int fieldHeight = pacField.getHeight();
         int fieldWidth = pacField.getWidth();
-        double yScale = size.getHeight()/(fieldHeight*BLOCK_SIZE);
-        double xScale = size.getWidth()/(fieldWidth*BLOCK_SIZE);
+        double yScale = size.getHeight()/(fieldHeight*blockSize);
+        double xScale = size.getWidth()/(fieldWidth*blockSize);
 
         AffineTransform transform = g.getTransform();
         g.scale(xScale, yScale);
@@ -35,6 +35,7 @@ public class Renderer {
     }
 
     private void renderField(Graphics2D g, int[][] field) {
+        int blockSize = pacContext.getBlockSize();
         int rowCount = field.length;
         for (int i = 0; i < rowCount; i++) {
             int[] row = field[i];
@@ -47,7 +48,7 @@ public class Renderer {
                 if (block == 1) {
                     g.setColor(new Color(0, 0, 0));
                 }
-                g.fillRect(BLOCK_SIZE*j, BLOCK_SIZE*i, BLOCK_SIZE, BLOCK_SIZE);
+                g.fillRect(blockSize*j, blockSize*i, blockSize, blockSize);
             }
         }
     }

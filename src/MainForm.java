@@ -39,7 +39,7 @@ public class MainForm extends JFrame {
             }
         });
         pacContext = new PacContext();
-        player = new Person();
+        player = new Person(pacContext);
         pacContext.getEngine().addWorldObject("player", player);
         pacContext.getRenderer().addRenderObject("player", player);
         registerKeyboard();

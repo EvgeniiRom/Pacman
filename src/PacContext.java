@@ -4,6 +4,7 @@ public class PacContext {
     private Engine engine;
     private PacField pacField;
     private Renderer renderer;
+    private int blockSize = 10;
 
     public Engine getEngine() {
         return engine;
@@ -15,6 +16,10 @@ public class PacContext {
 
     public Renderer getRenderer() {
         return renderer;
+    }
+
+    public int getBlockSize() {
+        return blockSize;
     }
 
     public PacContext() throws IOException {
