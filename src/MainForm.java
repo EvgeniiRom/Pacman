@@ -8,9 +8,8 @@ public class MainForm extends JFrame {
     private JPanel contentPane;
     private JButton startButton;
     private JButton stopButton;
-    private GamePanel gamePanel;
 
-    private PacContext pacContext;
+    private GameManager gameManager;
     private Logger logger = Logger.getLogger(MainForm.class.getName());
 
     public static void main(String[] args) throws IOException {
@@ -37,27 +36,13 @@ public class MainForm extends JFrame {
                 onStop();
             }
         });
-        pacContext = new PacContext();
+        gameManager = new GameManager();
 
         registerKeyboard();
 
-        gamePanel = new GamePanel(pacContext);
-        contentPane.add(gamePanel, BorderLayout.CENTER);
-        setPreferredSize(new Dimension(600, 400));
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        Thread.sleep(10);
-                        gamePanel.repaint();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        contentPane.add(gameManager.getGamePanel(), BorderLayout.CENTER);
+        setPreferredSize(new Dimension(600, 400));
     }
 
     private void registerKeyboard(){
@@ -98,26 +83,26 @@ public class MainForm extends JFrame {
 
     private void onUp(){
         logger.info("up");
-        pacContext.getPlayer().setPreferredDir(Actor.Dir.UP);
+        gameManager.getPacContext().getPlayer().setPreferredDir(Actor.Dir.UP);
     }
     private void onDown(){
         logger.info("down");
-        pacContext.getPlayer().setPreferredDir(Actor.Dir.DOWN);
+        gameManager.getPacContext().getPlayer().setPreferredDir(Actor.Dir.DOWN);
     }
     private void onLeft(){
         logger.info("left");
-        pacContext.getPlayer().setPreferredDir(Actor.Dir.LEFT);
+        gameManager.getPacContext().getPlayer().setPreferredDir(Actor.Dir.LEFT);
     }
     private void onRight(){
         logger.info("right");
-        pacContext.getPlayer().setPreferredDir(Actor.Dir.RIGHT);
+        gameManager.getPacContext().getPlayer().setPreferredDir(Actor.Dir.RIGHT);
     }
     private void onStart() {
         logger.info("start");
-        pacContext.getEngine().startWorld();
+        gameManager.startGame();
     }
     private void onStop() {
         logger.info("stop");
-        pacContext.getEngine().stopWorld();
+        gameManager.stopGame();
     }
 }

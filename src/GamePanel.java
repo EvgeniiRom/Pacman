@@ -2,17 +2,16 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GamePanel extends JComponent {
-    private PacContext pacContext;
+    private Renderer renderer;
 
-    public GamePanel(PacContext pacContext) {
-        this.pacContext = pacContext;
+    public GamePanel(Renderer renderer) {
+        this.renderer = renderer;
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         Dimension size = getSize();
-        Renderer renderer = pacContext.getRenderer();
         renderer.render((Graphics2D)g, size);
     }
 }

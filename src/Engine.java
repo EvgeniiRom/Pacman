@@ -41,7 +41,7 @@ public class Engine {
         }
     }
 
-    public void startWorld() {
+    public void start() {
         if (started || !stopped) {
             logger.info("engine already started");
             return;
@@ -74,7 +74,7 @@ public class Engine {
         }).start();
     }
 
-    public void stopWorld() {
+    public void stop() {
         new Thread(new Runnable() {
             @Override
             public void run() {
