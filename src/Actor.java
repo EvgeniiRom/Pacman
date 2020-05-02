@@ -1,5 +1,5 @@
-import java.awt.*;
-import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Actor implements IWorldObject{
     protected PacContext pacContext;
@@ -7,7 +7,7 @@ public abstract class Actor implements IWorldObject{
     private Coord<Double> startCoord = new Coord<>(15d, 15d);
     private Coord<Double> targetCoord = new Coord<>(15d, 15d);
     protected Coord<Double> currentCoord = new Coord<>(15d, 15d);
-    protected double defV = 20f;
+    protected double defV = 20d;
 
     protected Dir preferredDir = Dir.NONE;
 
@@ -31,6 +31,19 @@ public abstract class Actor implements IWorldObject{
     @Override
     public void start() {
         currentCoord = new Coord<>(15d, 15d);
+    }
+
+    protected List<Dir> getPossibleDirList(Coord<Integer> blockIndex){
+        List<Dir> result = new ArrayList<>();
+        int[][] field = pacContext.getPacField().getField();
+        Dir[] dirs = Dir.values();
+        for (Dir dir : dirs) {
+            Coord<Integer> nextBlockIndex = getNextBlockIndex(dir, blockIndex);
+            if(!nextBlockIndex.equals(blockIndex) && validBlockIndex(nextBlockIndex) && field[nextBlockIndex.y][nextBlockIndex.x]!=1){
+                result.add(dir);
+            }
+        }
+        return result;
     }
 
     protected Coord<Integer> getBlockIndex() {
