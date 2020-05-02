@@ -10,6 +10,9 @@ public class PacField {
     private int width = 0;
     private int height = 0;
     private int[][] field = new int[0][0];
+    private List<Coord<Integer>> sweets = new ArrayList<>();
+    private List<Coord<Integer>> bots = new ArrayList<>();
+    private Coord<Integer> player = new Coord<>(1, 1);
 
     public int getWidth() {
         return width;
@@ -21,6 +24,18 @@ public class PacField {
 
     public int[][] getField() {
         return field;
+    }
+
+    public List<Coord<Integer>> getSweets() {
+        return sweets;
+    }
+
+    public List<Coord<Integer>> getBots() {
+        return bots;
+    }
+
+    public Coord<Integer> getPlayer() {
+        return player;
     }
 
     public void read(String path) throws IOException {
@@ -36,18 +51,36 @@ public class PacField {
         });
         width = lines.get(0).split(" ").length;
         height = lines.size();
+
         field = new int[height][width];
-        for(int i = 0; i<height; i++) {
+
+        for (int i = 0; i < height; i++) {
             String line = lines.get(i);
             String[] blocks = line.split(" ");
-            for(int j = 0; j<width; j++){
-                field[i][j] = Integer.valueOf(blocks[j]);
+            for (int j = 0; j < width; j++) {
+                if (blocks[j].equals("1")) {
+                    field[i][j] = 1;
+                }
+                if (blocks[j].equals("g")) {
+                    field[i][j] = 2;
+                }
+                if (blocks[j].equals("s")) {
+                    sweets.add(new Coord<>(j, i));
+                }
+                if (blocks[j].equals("b")) {
+                    bots.add(new Coord<>(j, i));
+                }
+                if (blocks[j].equals("p")) {
+                    player = new Coord<>(j, i);
+                }
             }
         }
+
+
         bufferedReader.close();
     }
 
-    public void printField(){
+    public void printField() {
         for (int[] row : field) {
             for (int block : row) {
                 System.out.print(block + " ");

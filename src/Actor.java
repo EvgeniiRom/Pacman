@@ -6,7 +6,7 @@ public abstract class Actor implements IWorldObject{
     private double pathOffset = 0d;
     private Coord<Double> startCoord = new Coord<>(15d, 15d);
     private Coord<Double> targetCoord = new Coord<>(15d, 15d);
-    protected Coord<Double> currentCoord = new Coord<>(15d, 15d);
+    private Coord<Double> currentCoord = new Coord<>(15d, 15d);
     protected double defV = 20d;
 
     protected Dir preferredDir = Dir.NONE;
@@ -27,10 +27,16 @@ public abstract class Actor implements IWorldObject{
         LEFT;
     }
 
+    public void setLocationToBlock(Coord<Integer> blockIndex){
+        int blockSize = pacContext.getBlockSize();
+        currentCoord = new Coord<Double>(blockSize * (blockIndex.x + 0.5d), blockSize * (blockIndex.y + 0.5d));
+        startCoord = currentCoord.clone();
+        targetCoord = currentCoord.clone();
+    }
 
     @Override
     public void start() {
-        currentCoord = new Coord<>(15d, 15d);
+
     }
 
     protected List<Dir> getPossibleDirList(Coord<Integer> blockIndex){
@@ -39,7 +45,7 @@ public abstract class Actor implements IWorldObject{
         Dir[] dirs = Dir.values();
         for (Dir dir : dirs) {
             Coord<Integer> nextBlockIndex = getNextBlockIndex(dir, blockIndex);
-            if(!nextBlockIndex.equals(blockIndex) && validBlockIndex(nextBlockIndex) && field[nextBlockIndex.y][nextBlockIndex.x]!=1){
+            if(!nextBlockIndex.equals(blockIndex) && validBlockIndex(nextBlockIndex) && field[nextBlockIndex.y][nextBlockIndex.x]==0){
                 result.add(dir);
             }
         }
@@ -81,7 +87,7 @@ public abstract class Actor implements IWorldObject{
         Coord<Integer> blockIndex = getNextBlockIndex(preferredDir, getBlockIndex());
         int[][] field = pacContext.getPacField().getField();
         int blockSize = pacContext.getBlockSize();
-        if (validBlockIndex(blockIndex) && field[blockIndex.y][blockIndex.x] != 1) {
+        if (validBlockIndex(blockIndex) && field[blockIndex.y][blockIndex.x] == 0) {
             return new Coord<Double>(blockSize * (blockIndex.x + 0.5d), blockSize * (blockIndex.y + 0.5d));
         }
         return startCoord.clone();

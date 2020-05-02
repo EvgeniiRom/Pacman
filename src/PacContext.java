@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.List;
 
 public class PacContext {
     private Engine engine;
@@ -35,10 +36,6 @@ public class PacContext {
         pacField.read("field.ini");
         pacField.printField();
 
-        player = new Player(this);
-        engine.addWorldObject("player", player);
-        renderer.addRenderObject("player", player);
-
         int[][] field = pacField.getField();
         int sweetOffset = 0;
         int fieldHeight = pacField.getHeight();
@@ -55,8 +52,32 @@ public class PacContext {
             }
         }
 
-        Bot bot = new Bot(this);
-        engine.addWorldObject("bot1", bot);
-        renderer.addRenderObject("bot1", bot);
+        List<Coord<Integer>> bots = pacField.getBots();
+        int botCount = bots.size();
+        for (int i = 0; i<botCount; i++) {
+            Coord<Integer> coord = bots.get(i);
+            Bot bot = new Bot(this);
+            bot.setLocationToBlock(coord);
+            String id = "bot_" + i;
+            engine.addWorldObject(id, bot);
+            renderer.addRenderObject(id, bot);
+        }
+
+        List<Coord<Integer>> sweets = pacField.getSweets();
+        int sweetCount = sweets.size();
+        for (int i = 0; i<sweetCount; i++) {
+            Coord<Integer> coord = sweets.get(i);
+            Coord<Double> sweetCoord = new Coord<>((coord.x + 0.5) * blockSize, (coord.y + 0.5) * blockSize);
+            String id = "sweet_" + i;
+            Sweet sweet = new Sweet(this, sweetCoord, id);
+            engine.addWorldObject(id, sweet);
+            renderer.addRenderObject(id, sweet);
+        }
+
+        Coord<Integer> playerBlock = pacField.getPlayer();
+        player = new Player(this);
+        player.setLocationToBlock(playerBlock);
+        engine.addWorldObject("player", player);
+        renderer.addRenderObject("player", player);
     }
 }

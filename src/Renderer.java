@@ -68,6 +68,9 @@ public class Renderer {
                 if (block == 1) {
                     g.setColor(new Color(0, 0, 0));
                 }
+                if (block == 2) {
+                    g.setColor(new Color(0, 161, 212));
+                }
                 g.fillRect(blockSize*j, blockSize*i, blockSize, blockSize);
             }
         }
