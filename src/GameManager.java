@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -9,6 +10,8 @@ public class GameManager {
     private PacContext pacContext;
     private Thread updatePanelThread = null;
     private boolean gameStarted = false;
+    private List<GameListener> listenerList = new ArrayList<>();
+
     private Logger logger = Logger.getLogger(GameManager.class.getName());
 
     public GamePanel getGamePanel() {
@@ -56,6 +59,10 @@ public class GameManager {
         return pacContext;
     }
 
+    public void addGameListener(GameListener listener){
+        listenerList.add(listener);
+    }
+
     public void startGame(){
         if(!gameStarted) {
             updatePanelThread = new Thread(new Runnable() {
@@ -94,5 +101,13 @@ public class GameManager {
     public void removeObject(String id){
         engine.removeWorldObject(id);
         renderer.removeRenderObject(id);
+    }
+
+    public void incrementScore(int score){
+        int value = pacContext.getScore() + score;
+        pacContext.setScore(value);
+        for (GameListener gameListener : listenerList) {
+            gameListener.onScoreChange(value);
+        }
     }
 }

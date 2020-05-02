@@ -8,6 +8,7 @@ public class MainForm extends JFrame {
     private JPanel contentPane;
     private JButton startButton;
     private JButton stopButton;
+    private JLabel scoreLabel;
 
     private GameManager gameManager;
     private Logger logger = Logger.getLogger(MainForm.class.getName());
@@ -37,10 +38,13 @@ public class MainForm extends JFrame {
             }
         });
         gameManager = new GameManager();
-
+        gameManager.addGameListener(new GameListener() {
+            @Override
+            public void onScoreChange(int score) {
+                scoreLabel.setText(Integer.toString(score));
+            }
+        });
         registerKeyboard();
-
-
         contentPane.add(gameManager.getGamePanel(), BorderLayout.CENTER);
         setPreferredSize(new Dimension(600, 400));
     }

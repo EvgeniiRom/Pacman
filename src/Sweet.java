@@ -30,7 +30,9 @@ public class Sweet implements IWorldObject, IRenderObject {
         double dx = playerCoord.x - coord.x;
         double dy = playerCoord.y - coord.y;
         if(Math.sqrt(dx*dx + dy*dy)<eatDistance){
-            pacContext.getGameManager().removeObject(id);
+            GameManager gameManager = pacContext.getGameManager();
+            gameManager.incrementScore(10);
+            gameManager.removeObject(id);
         }
     }
 
