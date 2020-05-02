@@ -1,13 +1,14 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Actor implements IWorldObject{
+public abstract class Actor implements IWorldObject {
     protected PacContext pacContext;
     private double pathOffset = 0d;
     private Coord<Double> startCoord = new Coord<>(15d, 15d);
     private Coord<Double> targetCoord = new Coord<>(15d, 15d);
     private Coord<Double> currentCoord = new Coord<>(15d, 15d);
     protected double defV = 20d;
+    public boolean gateKey = false;
 
     protected Dir preferredDir = Dir.NONE;
 
@@ -19,6 +20,10 @@ public abstract class Actor implements IWorldObject{
         return currentCoord;
     }
 
+    public void setGateKey(boolean gateKey) {
+        this.gateKey = gateKey;
+    }
+
     public enum Dir {
         NONE,
         UP,
@@ -27,7 +32,22 @@ public abstract class Actor implements IWorldObject{
         LEFT;
     }
 
-    public void setLocationToBlock(Coord<Integer> blockIndex){
+    public Dir getReverseDir(Dir dir)
+    {
+        switch (dir) {
+            case UP:
+                return Dir.DOWN;
+            case RIGHT:
+                return Dir.LEFT;
+            case DOWN:
+                return Dir.UP;
+            case LEFT:
+                return Dir.RIGHT;
+        }
+        return Dir.NONE;
+    }
+
+    public void setLocationToBlock(Coord<Integer> blockIndex) {
         int blockSize = pacContext.getBlockSize();
         currentCoord = new Coord<Double>(blockSize * (blockIndex.x + 0.5d), blockSize * (blockIndex.y + 0.5d));
         startCoord = currentCoord.clone();
@@ -39,13 +59,13 @@ public abstract class Actor implements IWorldObject{
 
     }
 
-    protected List<Dir> getPossibleDirList(Coord<Integer> blockIndex){
+    protected List<Dir> getPossibleDirList(Coord<Integer> blockIndex) {
         List<Dir> result = new ArrayList<>();
-        int[][] field = pacContext.getPacField().getField();
         Dir[] dirs = Dir.values();
         for (Dir dir : dirs) {
             Coord<Integer> nextBlockIndex = getNextBlockIndex(dir, blockIndex);
-            if(!nextBlockIndex.equals(blockIndex) && validBlockIndex(nextBlockIndex) && field[nextBlockIndex.y][nextBlockIndex.x]==0){
+            int nextBlock = pacContext.getPacField().getBlock(nextBlockIndex);
+            if (!nextBlockIndex.equals(blockIndex) && (nextBlock == 0 || nextBlock == 2 && gateKey)) {
                 result.add(dir);
             }
         }
@@ -59,12 +79,7 @@ public abstract class Actor implements IWorldObject{
         return new Coord<>(x, y);
     }
 
-    protected boolean validBlockIndex(Coord<Integer> blockIndex) {
-        PacField pacField = pacContext.getPacField();
-        return blockIndex.x >= 0 && blockIndex.x < pacField.getWidth() && blockIndex.y >= 0 && blockIndex.y < pacField.getHeight();
-    }
-
-    protected Coord<Integer> getNextBlockIndex(Dir dir, Coord<Integer> currentBlockIndex){
+    protected Coord<Integer> getNextBlockIndex(Dir dir, Coord<Integer> currentBlockIndex) {
         Coord<Integer> blockIndex = new Coord<>(currentBlockIndex.x, currentBlockIndex.y);
         switch (dir) {
             case UP:
@@ -85,9 +100,9 @@ public abstract class Actor implements IWorldObject{
 
     protected Coord<Double> getNextCoord(Dir dir) {
         Coord<Integer> blockIndex = getNextBlockIndex(preferredDir, getBlockIndex());
-        int[][] field = pacContext.getPacField().getField();
         int blockSize = pacContext.getBlockSize();
-        if (validBlockIndex(blockIndex) && field[blockIndex.y][blockIndex.x] == 0) {
+        int block = pacContext.getPacField().getBlock(blockIndex);
+        if (block == 0 || block == 2 && gateKey) {
             return new Coord<Double>(blockSize * (blockIndex.x + 0.5d), blockSize * (blockIndex.y + 0.5d));
         }
         return startCoord.clone();
@@ -107,6 +122,9 @@ public abstract class Actor implements IWorldObject{
             startCoord = targetCoord.clone();
             currentCoord = targetCoord.clone();
             targetCoord = getNextCoord(preferredDir);
+            if(targetCoord.equals(currentCoord)){
+                //preferredDir = Dir.NONE;
+            }
         }
     }
 

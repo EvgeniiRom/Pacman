@@ -38,6 +38,17 @@ public class PacField {
         return player;
     }
 
+    public int getBlock(Coord<Integer> blockIndex){
+        if(!validBlockIndex(blockIndex)){
+            return -1;
+        }
+        return field[blockIndex.y][blockIndex.x];
+    }
+
+    public boolean validBlockIndex(Coord<Integer> blockIndex) {
+        return blockIndex.x >= 0 && blockIndex.x <  width && blockIndex.y >= 0 && blockIndex.y < height;
+    }
+
     public void read(String path) throws IOException {
         File file = new File(path);
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));

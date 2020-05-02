@@ -8,17 +8,20 @@ import java.util.List;
 import java.util.Queue;
 
 public class Bot extends Actor implements IRenderObject {
+    private Coord<Integer> currentBlock;
     private int w = 10;
     private int h = 10;
 
     public Bot(PacContext pacContext) {
         super(pacContext);
+        setGateKey(true);
     }
 
     @Override
     public void start() {
         super.start();
-        preferredDir = Dir.RIGHT;
+        currentBlock = getBlockIndex();
+        preferredDir = Dir.NONE;
         defV = 15d;
     }
 
@@ -29,17 +32,17 @@ public class Bot extends Actor implements IRenderObject {
         int[][] field = pacContext.getPacField().getField();
         while (!queue.isEmpty()) {
             Pair<Coord<Integer>, Integer> next = queue.poll();
-            Coord<Integer> block = next.getKey();
-            if (!used[block.y][block.x]) {
-                used[block.y][block.x] = true;
-                if (target.equals(block)) {
+            Coord<Integer> blockIndex = next.getKey();
+            if (!used[blockIndex.y][blockIndex.x]) {
+                used[blockIndex.y][blockIndex.x] = true;
+                if (target.equals(blockIndex)) {
                     return next.getValue();
                 }
                 for (Dir nextDir : dirs) {
-                    Coord<Integer> nextBlockIndex = getNextBlockIndex(nextDir, block);
-                    if (!nextBlockIndex.equals(block) &&
-                            validBlockIndex(nextBlockIndex) &&
-                            field[nextBlockIndex.y][nextBlockIndex.x] == 0 &&
+                    Coord<Integer> nextBlockIndex = getNextBlockIndex(nextDir, blockIndex);
+                    int nextBlock = pacContext.getPacField().getBlock(nextBlockIndex);
+                    if (!nextBlockIndex.equals(blockIndex) &&
+                            (nextBlock == 0 || nextBlock == 2 && gateKey) &&
                             !used[nextBlockIndex.y][nextBlockIndex.x]) {
                         queue.add(new Pair<>(nextBlockIndex, next.getValue() + 1));
                     }
@@ -49,7 +52,7 @@ public class Bot extends Actor implements IRenderObject {
         return Integer.MAX_VALUE;
     }
 
-    private boolean[][] prepareKeyField(){
+    private boolean[][] prepareKeyField() {
         PacField pacField = pacContext.getPacField();
         int height = pacField.getHeight();
         int width = pacField.getWidth();
@@ -57,37 +60,52 @@ public class Bot extends Actor implements IRenderObject {
         return booleans;
     }
 
-    private Dir getRandomDir(){
-        List<Dir> possibleDirList = getPossibleDirList(getBlockIndex());
+    private Dir getRandomDir(List<Dir> possibleDirList) {
         int size = possibleDirList.size();
-        if(size > 0){
+        if (size > 0) {
             return possibleDirList.get(Math.abs(Randomizer.getInstance().getInteger()) % size);
         }
         return Dir.NONE;
     }
 
+    private Dir getRandomDir() {
+        List<Dir> possibleDirList = getPossibleDirList(getBlockIndex());
+        return getRandomDir(possibleDirList);
+    }
+
     @Override
     public void update(long time) {
         Coord<Integer> blockIndex = getBlockIndex();
-        List<Dir> possibleDirList = getPossibleDirList(blockIndex);
-        Coord<Integer> playerBlock = pacContext.getPlayer().getBlockIndex();
-        int minDepth = Integer.MAX_VALUE;
-        Dir nextDir = Dir.NONE;
-        if(!playerBlock.equals(blockIndex)){
-            for (Dir dir : possibleDirList) {
-                boolean[][] used = prepareKeyField();
-                Coord<Integer> nextBlockIndex = getNextBlockIndex(dir, blockIndex);
-                int depth = bfs(nextBlockIndex, playerBlock, used);
-                if(depth<minDepth){
-                    minDepth = depth;
-                    nextDir = dir;
-                }
+        if (!blockIndex.equals(currentBlock) || preferredDir == Dir.NONE) {
+            currentBlock = blockIndex;
+            List<Dir> possibleDirList = getPossibleDirList(currentBlock);
+            Dir reverseDir = getReverseDir(preferredDir);
+            possibleDirList.remove(reverseDir);
+            if (possibleDirList.size() > 0) {
+                setPreferredDir(getRandomDir(possibleDirList));
+            } else {
+                setPreferredDir(reverseDir);
             }
         }
-        if(nextDir==Dir.NONE){
-            nextDir = getRandomDir();
-        }
-        setPreferredDir(nextDir);
+//        List<Dir> possibleDirList = getPossibleDirList(blockIndex);
+//        Coord<Integer> playerBlock = pacContext.getPlayer().getBlockIndex();
+//        int minDepth = Integer.MAX_VALUE;
+//        Dir nextDir = Dir.NONE;
+//        if(!playerBlock.equals(blockIndex)){
+//            for (Dir dir : possibleDirList) {
+//                boolean[][] used = prepareKeyField();
+//                Coord<Integer> nextBlockIndex = getNextBlockIndex(dir, blockIndex);
+//                int depth = bfs(nextBlockIndex, playerBlock, used);
+//                if(depth<minDepth){
+//                    minDepth = depth;
+//                    nextDir = dir;
+//                }
+//            }
+//        }
+//        if(nextDir==Dir.NONE){
+//            nextDir = getRandomDir();
+//        }
+//        setPreferredDir(nextDir);
         super.update(time);
     }
 
