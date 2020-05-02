@@ -2,8 +2,8 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 
 public class Player extends Actor implements IRenderObject{
-    private int w = 10;
-    private int h = 10;
+    private int w = 32;
+    private int h = 32;
 
     public Player(PacContext pacContext) {
         super(pacContext);

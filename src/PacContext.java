@@ -7,7 +7,7 @@ public class PacContext {
     private Renderer renderer;
     private Player player;
 
-    private int blockSize = 10;
+    private int blockSize = 40;
 
     public Engine getEngine() {
         return engine;

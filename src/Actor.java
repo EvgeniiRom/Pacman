@@ -7,9 +7,10 @@ public abstract class Actor implements IWorldObject {
     private Coord<Double> startCoord = new Coord<>(15d, 15d);
     private Coord<Double> targetCoord = new Coord<>(15d, 15d);
     private Coord<Double> currentCoord = new Coord<>(15d, 15d);
-    protected double defV = 20d;
+    protected double defV = 100d;
     public boolean gateKey = false;
 
+    protected Dir dir = Dir.NONE;
     protected Dir preferredDir = Dir.NONE;
 
     public Actor(PacContext pacContext) {
@@ -112,19 +113,28 @@ public abstract class Actor implements IWorldObject {
     public void update(long time) {
         pathOffset += defV * time / 1000d;
         double needGo = Math.max(Math.abs(targetCoord.x - startCoord.x), Math.abs(targetCoord.y - startCoord.y));
+        double donePercent = pathOffset / needGo;
 
-        double donePercent = Math.abs(pathOffset) / needGo;
         currentCoord.x = startCoord.x + (targetCoord.x - startCoord.x) * donePercent;
         currentCoord.y = startCoord.y + (targetCoord.y - startCoord.y) * donePercent;
 
-        if (Math.abs(pathOffset) > needGo) {
+        if(preferredDir!=Dir.NONE && preferredDir == getReverseDir(dir)){
+            Coord<Double> temp = targetCoord;
+            targetCoord = startCoord;
+            startCoord = temp;
+            pathOffset = Math.max(Math.abs(currentCoord.x - startCoord.x), Math.abs(currentCoord.y - startCoord.y));
+            dir = preferredDir;
+        }
+
+        if (pathOffset > needGo) {
             pathOffset = 0;
             startCoord = targetCoord.clone();
             currentCoord = targetCoord.clone();
             targetCoord = getNextCoord(preferredDir);
             if(targetCoord.equals(currentCoord)){
-                //preferredDir = Dir.NONE;
+                preferredDir = Dir.NONE;
             }
+            dir = preferredDir;
         }
     }
 

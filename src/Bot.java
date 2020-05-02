@@ -9,8 +9,8 @@ import java.util.Queue;
 
 public class Bot extends Actor implements IRenderObject {
     private Coord<Integer> currentBlock;
-    private int w = 10;
-    private int h = 10;
+    private int w = 32;
+    private int h = 32;
 
     public Bot(PacContext pacContext) {
         super(pacContext);
@@ -22,7 +22,7 @@ public class Bot extends Actor implements IRenderObject {
         super.start();
         currentBlock = getBlockIndex();
         preferredDir = Dir.NONE;
-        defV = 15d;
+        defV = 90d;
     }
 
     private int bfs(Coord<Integer> startBlock, Coord<Integer> target, boolean[][] used) {

@@ -2,10 +2,10 @@ import java.awt.*;
 
 public class Sweet implements IWorldObject, IRenderObject {
     private PacContext pacContext;
-    private int r = 1;
+    private int r = 4;
     private Coord<Double> coord = new Coord<>(0d,0d);
     private String id;
-    private double eatDistance = 5d;
+    private double eatDistance = 16d;
 
     public Sweet(PacContext pacContext, Coord<Double> coord, String id) {
         this.pacContext = pacContext;
