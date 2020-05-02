@@ -98,19 +98,19 @@ public class MainForm extends JFrame {
 
     private void onUp(){
         logger.info("up");
-        pacContext.getPlayer().setPreferredDir(Person.Dir.UP);
+        pacContext.getPlayer().setPreferredDir(Actor.Dir.UP);
     }
     private void onDown(){
         logger.info("down");
-        pacContext.getPlayer().setPreferredDir(Person.Dir.DOWN);
+        pacContext.getPlayer().setPreferredDir(Actor.Dir.DOWN);
     }
     private void onLeft(){
         logger.info("left");
-        pacContext.getPlayer().setPreferredDir(Person.Dir.LEFT);
+        pacContext.getPlayer().setPreferredDir(Actor.Dir.LEFT);
     }
     private void onRight(){
         logger.info("right");
-        pacContext.getPlayer().setPreferredDir(Person.Dir.RIGHT);
+        pacContext.getPlayer().setPreferredDir(Actor.Dir.RIGHT);
     }
     private void onStart() {
         logger.info("start");

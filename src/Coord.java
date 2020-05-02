@@ -26,4 +26,15 @@ public class Coord<T> {
     public Coord clone(){
         return new Coord<T>(x, y);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            Coord<T> coord = (Coord<T>) obj;
+            return this.x.equals(coord.x) && this.y.equals(coord.y);
+        }
+        catch (ClassCastException e){
+            return super.equals(obj);
+        }
+    }
 }

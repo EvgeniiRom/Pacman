@@ -4,7 +4,7 @@ public class PacContext {
     private Engine engine;
     private PacField pacField;
     private Renderer renderer;
-    private Person player;
+    private Player player;
 
     private int blockSize = 10;
 
@@ -24,7 +24,7 @@ public class PacContext {
         return blockSize;
     }
 
-    public Person getPlayer() {
+    public Actor getPlayer() {
         return player;
     }
 
@@ -35,7 +35,7 @@ public class PacContext {
         pacField.read("field.ini");
         pacField.printField();
 
-        player = new Person(this);
+        player = new Player(this);
         engine.addWorldObject("player", player);
         renderer.addRenderObject("player", player);
 
@@ -54,5 +54,9 @@ public class PacContext {
                 }
             }
         }
+
+        Bot bot = new Bot(this);
+        engine.addWorldObject("bot1", bot);
+        renderer.addRenderObject("bot1", bot);
     }
 }
