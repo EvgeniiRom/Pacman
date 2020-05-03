@@ -25,7 +25,7 @@ public class GameManager {
         pacContext = new PacContext(this);
         renderer = new Renderer(pacContext);
         engine = new Engine();
-        gamePanel = new GamePanel(renderer);
+        gamePanel = new GamePanel(pacContext, renderer);
 
     }
 
@@ -146,7 +146,7 @@ public class GameManager {
     }
 
     private void gameOver() {
-
+        gamePanel.setScene(GamePanel.Scene.GAME_OVER);
     }
 
     private void createBoostTimer() {

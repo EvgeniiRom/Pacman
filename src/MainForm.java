@@ -45,7 +45,7 @@ public class MainForm extends JFrame implements GameListener{
         livesLabel.setText(Integer.toString(pacContext.getLives()));
         registerKeyboard();
         contentPane.add(gameManager.getGamePanel(), BorderLayout.CENTER);
-        setPreferredSize(new Dimension(600, 400));
+        setPreferredSize(new Dimension(600, 800));
     }
 
     private void registerKeyboard(){
