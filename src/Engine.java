@@ -6,6 +6,8 @@ public class Engine {
     private int worldUpdateDelay = 10;
     private boolean started = false;
     private boolean stopped = true;
+    private double timeScale = 1d;
+
     private Logger logger = Logger.getLogger(Engine.class.getName());
 
     private Map<String, IWorldObject> worldObjectsMap = new HashMap<>();
@@ -41,17 +43,24 @@ public class Engine {
         }
     }
 
+
+    public void restartObjects() {
+        synchronized (worldObjectsMap) {
+            Collection<IWorldObject> worldObjects = worldObjectsMap.values();
+            for (IWorldObject iWorldObject : worldObjects) {
+                iWorldObject.start();
+            }
+        }
+    }
+
     public void start() {
         if (started || !stopped) {
             logger.info("engine already started");
             return;
         }
-        Collection<IWorldObject> worldObjects = worldObjectsMap.values();
-        for (IWorldObject iWorldObject : worldObjects) {
-            iWorldObject.start();
-        }
         started = true;
         stopped = false;
+        restartObjects();
         logger.info("engine started");
         new Thread(new Runnable() {
             @Override
@@ -61,7 +70,8 @@ public class Engine {
                     while (started) {
                         Thread.sleep(worldUpdateDelay);
                         long currentTime = System.currentTimeMillis();
-                        worldTick(currentTime - lastUpdate);
+                        int time = (int) ((currentTime - lastUpdate) * timeScale);
+                        worldTick(time);
                         lastUpdate = currentTime;
                     }
                 } catch (InterruptedException e) {
@@ -72,6 +82,14 @@ public class Engine {
                 }
             }
         }).start();
+    }
+
+    public void pause(){
+        timeScale = 0d;
+    }
+
+    public void resume(){
+        timeScale = 1d;
     }
 
     public void stop() {

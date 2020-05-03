@@ -9,6 +9,7 @@ public class PacContext {
     private Player player;
     private int score = 0;
     private int blockSize = 40;
+    private int lives = 3;
 
     public PacContext(GameManager gameManager) throws IOException {
         this.gameManager = gameManager;
@@ -43,5 +44,13 @@ public class PacContext {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
     }
 }

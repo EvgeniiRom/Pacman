@@ -4,11 +4,12 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-public class MainForm extends JFrame {
+public class MainForm extends JFrame implements GameListener{
     private JPanel contentPane;
     private JButton startButton;
     private JButton stopButton;
     private JLabel scoreLabel;
+    private JLabel livesLabel;
 
     private GameManager gameManager;
     private Logger logger = Logger.getLogger(MainForm.class.getName());
@@ -38,12 +39,10 @@ public class MainForm extends JFrame {
             }
         });
         gameManager = new GameManager();
-        gameManager.addGameListener(new GameListener() {
-            @Override
-            public void onScoreChange(int score) {
-                scoreLabel.setText(Integer.toString(score));
-            }
-        });
+        gameManager.addGameListener(this);
+        PacContext pacContext = gameManager.getPacContext();
+        scoreLabel.setText(Integer.toString(pacContext.getScore()));
+        livesLabel.setText(Integer.toString(pacContext.getLives()));
         registerKeyboard();
         contentPane.add(gameManager.getGamePanel(), BorderLayout.CENTER);
         setPreferredSize(new Dimension(600, 400));
@@ -108,5 +107,20 @@ public class MainForm extends JFrame {
     private void onStop() {
         logger.info("stop");
         gameManager.stopGame();
+    }
+
+    @Override
+    public void onScoreChange(int score) {
+        scoreLabel.setText(Integer.toString(score));
+    }
+
+    @Override
+    public void onLiveChange(int lives) {
+        livesLabel.setText(Integer.toString(lives));
+    }
+
+    @Override
+    public void onGameOver() {
+
     }
 }

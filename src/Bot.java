@@ -11,6 +11,7 @@ public class Bot extends Actor implements IRenderObject {
     private Coord<Integer> currentBlock;
     private int w = 32;
     private int h = 32;
+    private double eatDistance = 20d;
 
     public Bot(PacContext pacContext) {
         super(pacContext);
@@ -75,6 +76,19 @@ public class Bot extends Actor implements IRenderObject {
 
     @Override
     public void update(long time) {
+        if(time==0){
+            return;
+        }
+
+        Coord<Double> playerCoord = pacContext.getPlayer().getCurrentCoord();
+        Coord<Double> coord = getCurrentCoord();
+        double dx = playerCoord.x - coord.x;
+        double dy = playerCoord.y - coord.y;
+        if(Math.sqrt(dx*dx + dy*dy)<eatDistance){
+            GameManager gameManager = pacContext.getGameManager();
+            gameManager.killPlayer();
+        }
+
         Coord<Integer> blockIndex = getBlockIndex();
         if (!blockIndex.equals(currentBlock) || preferredDir == Dir.NONE) {
             currentBlock = blockIndex;
@@ -87,25 +101,6 @@ public class Bot extends Actor implements IRenderObject {
                 setPreferredDir(reverseDir);
             }
         }
-//        List<Dir> possibleDirList = getPossibleDirList(blockIndex);
-//        Coord<Integer> playerBlock = pacContext.getPlayer().getBlockIndex();
-//        int minDepth = Integer.MAX_VALUE;
-//        Dir nextDir = Dir.NONE;
-//        if(!playerBlock.equals(blockIndex)){
-//            for (Dir dir : possibleDirList) {
-//                boolean[][] used = prepareKeyField();
-//                Coord<Integer> nextBlockIndex = getNextBlockIndex(dir, blockIndex);
-//                int depth = bfs(nextBlockIndex, playerBlock, used);
-//                if(depth<minDepth){
-//                    minDepth = depth;
-//                    nextDir = dir;
-//                }
-//            }
-//        }
-//        if(nextDir==Dir.NONE){
-//            nextDir = getRandomDir();
-//        }
-//        setPreferredDir(nextDir);
         super.update(time);
     }
 

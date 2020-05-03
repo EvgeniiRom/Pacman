@@ -24,9 +24,12 @@ public class GameManager {
         engine = new Engine();
         gamePanel = new GamePanel(renderer);
 
+    }
+
+    private void createWorldObjects() {
         Coord<Integer> playerBlock = pacContext.getPacField().getPlayer();
         Player player = new Player(pacContext);
-        player.setLocationToBlock(playerBlock);
+        player.setPreferredLocationToBlock(playerBlock);
         engine.addWorldObject("player", player);
         renderer.addRenderObject("player", player);
         pacContext.setPlayer(player);
@@ -36,7 +39,7 @@ public class GameManager {
         for (int i = 0; i<botCount; i++) {
             Coord<Integer> coord = bots.get(i);
             Bot bot = new Bot(pacContext);
-            bot.setLocationToBlock(coord);
+            bot.setPreferredLocationToBlock(coord);
             String id = "bot_" + i;
             engine.addWorldObject(id, bot);
             renderer.addRenderObject(id, bot);
@@ -64,6 +67,7 @@ public class GameManager {
     }
 
     public void startGame(){
+        createWorldObjects();
         if(!gameStarted) {
             updatePanelThread = new Thread(new Runnable() {
                 @Override
@@ -109,5 +113,25 @@ public class GameManager {
         for (GameListener gameListener : listenerList) {
             gameListener.onScoreChange(value);
         }
+    }
+
+    public void killPlayer(){
+        engine.pause();
+        int lives = pacContext.getLives();
+        lives--;
+        pacContext.setLives(lives);
+        for (GameListener gameListener : listenerList) {
+            gameListener.onLiveChange(lives);
+        }
+        if(lives==0) {
+            gameOver();
+        }else{
+            engine.restartObjects();
+            engine.resume();
+        }
+    }
+
+    private void gameOver(){
+
     }
 }

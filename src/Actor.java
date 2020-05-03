@@ -7,6 +7,7 @@ public abstract class Actor implements IWorldObject {
     private Coord<Double> startCoord = new Coord<>(15d, 15d);
     private Coord<Double> targetCoord = new Coord<>(15d, 15d);
     private Coord<Double> currentCoord = new Coord<>(15d, 15d);
+    private Coord<Double> preferredCoord = new Coord<>(15d, 15d);
     protected double defV = 100d;
     public boolean gateKey = false;
 
@@ -48,16 +49,18 @@ public abstract class Actor implements IWorldObject {
         return Dir.NONE;
     }
 
-    public void setLocationToBlock(Coord<Integer> blockIndex) {
+    public void setPreferredLocationToBlock(Coord<Integer> blockIndex) {
         int blockSize = pacContext.getBlockSize();
-        currentCoord = new Coord<Double>(blockSize * (blockIndex.x + 0.5d), blockSize * (blockIndex.y + 0.5d));
-        startCoord = currentCoord.clone();
-        targetCoord = currentCoord.clone();
+        preferredCoord = new Coord<Double>(blockSize * (blockIndex.x + 0.5d), blockSize * (blockIndex.y + 0.5d));
     }
 
     @Override
     public void start() {
-
+        currentCoord = preferredCoord.clone();
+        startCoord = currentCoord.clone();
+        targetCoord = currentCoord.clone();
+        preferredDir = Dir.NONE;
+        dir = Dir.NONE;
     }
 
     protected List<Dir> getPossibleDirList(Coord<Integer> blockIndex) {
