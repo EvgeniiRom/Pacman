@@ -7,31 +7,22 @@ public class Engine {
     private boolean started = false;
     private boolean stopped = true;
     private double timeScale = 1d;
+    private Thread updateThread = null;
 
     private Logger logger = Logger.getLogger(Engine.class.getName());
 
     private Map<String, IWorldObject> worldObjectsMap = new HashMap<>();
 
     public void addWorldObject(String id, IWorldObject object) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (worldObjectsMap) {
-                    worldObjectsMap.put(id, object);
-                }
-            }
-        }).start();
+        synchronized (worldObjectsMap) {
+            worldObjectsMap.put(id, object);
+        }
     }
 
     public void removeWorldObject(String id) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (worldObjectsMap) {
-                    worldObjectsMap.remove(id);
-                }
-            }
-        }).start();
+        synchronized (worldObjectsMap) {
+            worldObjectsMap.remove(id);
+        }
     }
 
     private synchronized void worldTick(long time) {
@@ -54,20 +45,16 @@ public class Engine {
     }
 
     public void start() {
-        if (started || !stopped) {
+        if (started){
             logger.info("engine already started");
             return;
         }
-        started = true;
-        stopped = false;
-        restartObjects();
-        logger.info("engine started");
-        new Thread(new Runnable() {
+        updateThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     long lastUpdate = System.currentTimeMillis();
-                    while (started) {
+                    while (true) {
                         Thread.sleep(worldUpdateDelay);
                         long currentTime = System.currentTimeMillis();
                         int time = (int) ((currentTime - lastUpdate) * timeScale);
@@ -75,13 +62,12 @@ public class Engine {
                         lastUpdate = currentTime;
                     }
                 } catch (InterruptedException e) {
-                    logger.info("engine update thread was interrupted");
-                } finally {
-                    started = false;
-                    stopped = true;
+                    logger.info("engine update thread interrupted");
                 }
             }
-        }).start();
+        });
+        updateThread.start();
+        started = true;
     }
 
     public void pause(){
@@ -93,23 +79,16 @@ public class Engine {
     }
 
     public void stop() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                started = false;
-                try {
-                    while (!stopped) {
-                        Thread.sleep(1);
-                    }
-                    Collection<IWorldObject> worldObjects = worldObjectsMap.values();
-                    for (IWorldObject iWorldObject : worldObjects) {
-                        iWorldObject.finish();
-                    }
-                    logger.info("engine stopped");
-                } catch (InterruptedException e) {
-                    logger.info("engine finish thread was interrupted");
-                }
+        if(!started){
+            logger.info("engine is not started");
+            return;
+        }
+        updateThread.interrupt();
+        synchronized (worldObjectsMap) {
+            Collection<IWorldObject> worldObjects = worldObjectsMap.values();
+            for (IWorldObject iWorldObject : worldObjects) {
+                iWorldObject.finish();
             }
-        }).start();
+        }
     }
 }

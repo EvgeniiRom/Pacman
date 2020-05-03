@@ -32,7 +32,12 @@ public class Sweet implements IWorldObject, IRenderObject {
         if(Math.sqrt(dx*dx + dy*dy)<eatDistance){
             GameManager gameManager = pacContext.getGameManager();
             gameManager.incrementScore(10);
-            gameManager.removeObject(id);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    gameManager.removeObject(id);
+                }
+            }).start();
         }
     }
 

@@ -78,7 +78,7 @@ public class GameManager {
                             gamePanel.repaint();
                         }
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        logger.info("game panel update thread interrupted");
                     }
                 }
             });

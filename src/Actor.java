@@ -57,8 +57,8 @@ public abstract class Actor implements IWorldObject {
     @Override
     public void start() {
         currentCoord = preferredCoord.clone();
-        startCoord = currentCoord.clone();
-        targetCoord = currentCoord.clone();
+        startCoord = preferredCoord.clone();
+        targetCoord = preferredCoord.clone();
         preferredDir = Dir.NONE;
         dir = Dir.NONE;
     }

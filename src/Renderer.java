@@ -13,25 +13,15 @@ public class Renderer {
     }
 
     public void addRenderObject(String id, IRenderObject renderObject){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (renderObjectMap){
-                    renderObjectMap.put(id, renderObject);
-                }
-            }
-        }).start();
+        synchronized (renderObjectMap){
+            renderObjectMap.put(id, renderObject);
+        }
     }
 
     public void removeRenderObject(String id){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (renderObjectMap){
-                    renderObjectMap.remove(id);
-                }
-            }
-        }).start();
+        synchronized (renderObjectMap){
+            renderObjectMap.remove(id);
+        }
     }
 
     public void render(Graphics2D g, Dimension size){
