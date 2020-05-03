@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 public class Engine {
     private int worldUpdateDelay = 10;
     private boolean started = false;
-    private boolean stopped = true;
     private double timeScale = 1d;
     private Thread updateThread = null;
 
@@ -22,6 +21,12 @@ public class Engine {
     public void removeWorldObject(String id) {
         synchronized (worldObjectsMap) {
             worldObjectsMap.remove(id);
+        }
+    }
+
+    public void removeAllWorldObjects() {
+        synchronized (worldObjectsMap) {
+            worldObjectsMap.clear();
         }
     }
 
@@ -49,6 +54,7 @@ public class Engine {
             logger.info("engine already started");
             return;
         }
+        timeScale = 1d;
         startObjects();
         updateThread = new Thread(new Runnable() {
             @Override
@@ -58,8 +64,10 @@ public class Engine {
                     while (true) {
                         Thread.sleep(worldUpdateDelay);
                         long currentTime = System.currentTimeMillis();
-                        int time = (int) ((currentTime - lastUpdate) * timeScale);
-                        worldTick(time);
+                        if(timeScale>0.001) {
+                            int time = (int) ((currentTime - lastUpdate) * timeScale);
+                            worldTick(time);
+                        }
                         lastUpdate = currentTime;
                     }
                 } catch (InterruptedException e) {

@@ -79,7 +79,7 @@ public class MainForm extends JFrame implements GameListener{
 
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onStop();
+                onPause();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
@@ -108,6 +108,10 @@ public class MainForm extends JFrame implements GameListener{
         logger.info("stop");
         gameManager.stopGame();
     }
+    private void onPause() {
+        logger.info("pause");
+        gameManager.pauseGame();
+    }
 
     @Override
     public void onScoreChange(int score) {
@@ -117,10 +121,5 @@ public class MainForm extends JFrame implements GameListener{
     @Override
     public void onLiveChange(int lives) {
         livesLabel.setText(Integer.toString(lives));
-    }
-
-    @Override
-    public void onGameOver() {
-
     }
 }

@@ -1,15 +1,23 @@
+import sun.applet.Main;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class GamePanel extends JPanel {
-    private Renderer renderer;
-    private JLabel overlayLabel;
     private PacContext pacContext;
-    private boolean overlay = false;
+    private Renderer renderer;
+    private CardLayout overlayLayout;
+    private JPanel overlayPanel;
 
-    public enum Scene{
+    private GameOverForm gameOverForm;
+    private MainMenuForm mainMenuForm;
+    private PauseForm pauseForm;
+
+    public enum Scene {
         MAIN_MENU,
         GAMING,
+        PAUSE,
         GAME_OVER;
     }
 
@@ -17,19 +25,30 @@ public class GamePanel extends JPanel {
         super(new BorderLayout());
         this.pacContext = pacContext;
         this.renderer = renderer;
-        overlayLabel = new JLabel("", SwingConstants.CENTER);
-        overlayLabel.setFont(new Font("01 DIGIT", Font.PLAIN, 50));
-        add(overlayLabel, BorderLayout.CENTER);
-        overlayLabel.setVisible(false);
-    }
 
-    private void setGameOverMessage(int score){
-        String text = "<html><p align=\"center\"><font color='white'>" +
-                "GAME OVER<br>" +
-                "<br>" +
-                "SCORE : " + String.valueOf(score) +
-                "</font></p></html>";
-        overlayLabel.setText(text);
+        overlayLayout = new CardLayout();
+        overlayPanel = new JPanel(overlayLayout){
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Dimension size = getSize();
+                g.setColor(new Color(0, 0, 0, 150));
+                g.fillRect(0, 0, size.width, size.height);
+            }
+        };
+        overlayPanel.setOpaque(false);
+
+        mainMenuForm = new MainMenuForm(pacContext);
+        pauseForm = new PauseForm(pacContext);
+        gameOverForm = new GameOverForm(pacContext);
+
+        overlayPanel.add(mainMenuForm.getMainPanel(), Scene.MAIN_MENU.name());
+        overlayPanel.add(pauseForm.getMainPanel(), Scene.PAUSE.name());
+        overlayPanel.add(gameOverForm.getMainPanel(), Scene.GAME_OVER.name());
+
+        add(overlayPanel, BorderLayout.CENTER);
+
+        overlayLayout.show(overlayPanel, Scene.MAIN_MENU.name());
     }
 
     @Override
@@ -37,25 +56,15 @@ public class GamePanel extends JPanel {
         super.paintComponent(g);
         Dimension size = getSize();
         renderer.render((Graphics2D) g, size);
-        if (overlay) {
-            g.setColor(new Color(0, 0, 0, 150));
-            g.fillRect(0, 0, size.width, size.height);
-        }
     }
 
-    public void setScene(Scene scene){
-        switch (scene) {
-            case MAIN_MENU:
-                break;
-            case GAMING:
-                overlay = false;
-                overlayLabel.setVisible(false);
-                break;
-            case GAME_OVER:
-                overlay = true;
-                setGameOverMessage(pacContext.getScore());
-                overlayLabel.setVisible(true);
-                break;
+    public void setScene(Scene scene) {
+        overlayLayout.show(overlayPanel, scene.name());
+
+        if(scene.equals(Scene.GAMING)){
+            overlayPanel.setVisible(false);
+        }else {
+            overlayPanel.setVisible(true);
         }
     }
 
@@ -67,7 +76,7 @@ public class GamePanel extends JPanel {
         String envfonts[] = gEnv.getAvailableFontFamilyNames();
         GridLayout layout = new GridLayout(envfonts.length, 1);
         JPanel jPanel = new JPanel(layout);
-        for (int i = 0; i<envfonts.length; i++) {
+        for (int i = 0; i < envfonts.length; i++) {
             JLabel jLabel = new JLabel(envfonts[i]);
             jLabel.setFont(new Font(envfonts[i], Font.PLAIN, 50));
             jPanel.add(jLabel);

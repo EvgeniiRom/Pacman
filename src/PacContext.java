@@ -18,6 +18,11 @@ public class PacContext {
         pacField.printField();
     }
 
+    public void setDefaultValues(){
+        score = 0;
+        lives = 3;
+    }
+
     public GameManager getGameManager() {
         return gameManager;
     }
@@ -51,6 +56,9 @@ public class PacContext {
     }
 
     public void setLives(int lives) {
+        if(lives==2){
+            int a = 1;
+        }
         this.lives = lives;
     }
 }

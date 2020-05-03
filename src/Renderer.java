@@ -24,6 +24,12 @@ public class Renderer {
         }
     }
 
+    public void removeAllObjects() {
+        synchronized (renderObjectMap) {
+            renderObjectMap.clear();
+        }
+    }
+
     public void render(Graphics2D g, Dimension size){
         int blockSize = pacContext.getBlockSize();
         PacField pacField = pacContext.getPacField();

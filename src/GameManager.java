@@ -33,9 +33,9 @@ public class GameManager {
         Coord<Integer> playerBlock = pacContext.getPacField().getPlayer();
         Player player = new Player(pacContext, "player");
         player.setDefaultLocationToBlock(playerBlock);
+        pacContext.setPlayer(player);
         engine.addWorldObject(player);
         renderer.addRenderObject(player);
-        pacContext.setPlayer(player);
 
         List<Coord<Integer>> bots = pacContext.getPacField().getBots();
         int botCount = bots.size();
@@ -80,8 +80,21 @@ public class GameManager {
         listenerList.add(listener);
     }
 
-    public void startGame() {
+    public void restartGame(){
+        engine.pause();
+        removeAllObject();
+        pacContext.setDefaultValues();
         createWorldObjects();
+        engine.startObjects();
+        engine.resume();
+        gamePanel.setScene(GamePanel.Scene.GAMING);
+    }
+
+    public void startGame() {
+        removeAllObject();
+        pacContext.setDefaultValues();
+        createWorldObjects();
+        engine.startObjects();
         if (!gameStarted) {
             updatePanelThread = new Thread(new Runnable() {
                 @Override
@@ -99,10 +112,22 @@ public class GameManager {
             updatePanelThread.start();
             engine.start();
             gameStarted = true;
+            gamePanel.setScene(GamePanel.Scene.GAMING);
             logger.info("game started");
         } else {
             logger.info("game already started");
         }
+    }
+
+
+    public void pauseGame(){
+        engine.pause();
+        gamePanel.setScene(GamePanel.Scene.PAUSE);
+    }
+
+    public void resumeGame(){
+        engine.resume();
+        gamePanel.setScene(GamePanel.Scene.GAMING);
     }
 
     public void stopGame() {
@@ -110,6 +135,7 @@ public class GameManager {
             updatePanelThread.interrupt();
             engine.stop();
             gameStarted = false;
+            gamePanel.setScene(GamePanel.Scene.MAIN_MENU);
             logger.info("game stopped");
         } else {
             logger.info("game is not started");
@@ -119,6 +145,11 @@ public class GameManager {
     public void removeObject(String id) {
         engine.removeWorldObject(id);
         renderer.removeRenderObject(id);
+    }
+
+    public void removeAllObject() {
+        engine.removeAllWorldObjects();
+        renderer.removeAllObjects();
     }
 
     public void incrementScore(int score) {
