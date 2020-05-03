@@ -14,6 +14,7 @@ public class PacField {
     private List<Coord<Integer>> bots = new ArrayList<>();
     private List<Coord<Integer>> boosts = new ArrayList<>();
     private Coord<Integer> player = new Coord<>(1, 1);
+    private Coord<Integer> botHome = new Coord<>(1, 1);
 
     public int getWidth() {
         return width;
@@ -41,6 +42,10 @@ public class PacField {
 
     public Coord<Integer> getPlayer() {
         return player;
+    }
+
+    public Coord<Integer> getBotHome() {
+        return botHome;
     }
 
     public int getBlock(Coord<Integer> blockIndex){
@@ -85,6 +90,10 @@ public class PacField {
                 }
                 if (blocks[j].equals("b")) {
                     bots.add(new Coord<>(j, i));
+                }
+                if (blocks[j].equals("h")) {
+                    bots.add(new Coord<>(j, i));
+                    botHome = new Coord<>(j, i);
                 }
                 if (blocks[j].equals("p")) {
                     player = new Coord<>(j, i);

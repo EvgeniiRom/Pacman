@@ -2,17 +2,17 @@ import javafx.util.Pair;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Queue;
 
 public class Bot extends Actor implements IRenderObject {
-    private Coord<Integer> currentBlock;
+    private Coord<Integer> lastBlockIndex;
     private int w = 32;
     private int h = 32;
     private double eatDistance = 20d;
     private double defV = 90d;
     private boolean immortal = true;
+    private boolean dead = false;
 
 
     public Bot(PacContext pacContext, String id) {
@@ -32,16 +32,18 @@ public class Bot extends Actor implements IRenderObject {
     @Override
     public void start() {
         super.start();
-        currentBlock = getBlockIndex();
+        lastBlockIndex = getBlockIndex();
         preferredDir = Dir.NONE;
         velosity = defV;
     }
 
     private int bfs(Coord<Integer> startBlock, Coord<Integer> target, boolean[][] used) {
+        if(startBlock.equals(target)){
+            return 0;
+        }
         Queue<Pair<Coord<Integer>, Integer>> queue = new LinkedList<>();
         queue.add(new Pair<>(startBlock, 0));
         Dir[] dirs = Dir.values();
-        int[][] field = pacContext.getPacField().getField();
         while (!queue.isEmpty()) {
             Pair<Coord<Integer>, Integer> next = queue.poll();
             Coord<Integer> blockIndex = next.getKey();
@@ -85,35 +87,81 @@ public class Bot extends Actor implements IRenderObject {
         return getRandomDir(possibleDirList);
     }
 
+    boolean meetPlayer(){
+        Coord<Double> playerCoord = pacContext.getPlayer().getCurrentCoord();
+        Coord<Double> coord = getCurrentCoord();
+        double dx = playerCoord.x - coord.x;
+        double dy = playerCoord.y - coord.y;
+        return Math.sqrt(dx*dx + dy*dy)<eatDistance;
+    }
+
+    private void death(){
+        dead = true;
+        velosity = 200d;
+    }
+
+    public void initRespawn(){
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                dead = false;
+                immortal = true;
+                gateKey = true;
+                velosity = defV;
+            }
+        };
+        Timer timer = new Timer();
+        timer.schedule(timerTask, 5000);
+    }
+
     @Override
     public void update(long time) {
         if(time==0){
             return;
         }
-
-        Coord<Double> playerCoord = pacContext.getPlayer().getCurrentCoord();
-        Coord<Double> coord = getCurrentCoord();
-        double dx = playerCoord.x - coord.x;
-        double dy = playerCoord.y - coord.y;
-        if(Math.sqrt(dx*dx + dy*dy)<eatDistance){
-            GameManager gameManager = pacContext.getGameManager();
+        GameManager gameManager = pacContext.getGameManager();
+        Coord<Integer> blockIndex = getBlockIndex();
+        if(meetPlayer()){
             if(immortal) {
                 gameManager.killPlayer();
-            }else{
-                //TODO respawn
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        gameManager.removeObject(getId());
-                    }
-                }).start();
+            }else {
+                death();
             }
         }
+        if(dead && gateKey){
+            goHome();
+        }else{
+            randomMotion();
+        }
+        lastBlockIndex = blockIndex;
+        super.update(time);
+    }
 
+    private void goHome() {
         Coord<Integer> blockIndex = getBlockIndex();
-        if (!blockIndex.equals(currentBlock) || preferredDir == Dir.NONE) {
-            currentBlock = blockIndex;
-            List<Dir> possibleDirList = getPossibleDirList(currentBlock);
+        if (!blockIndex.equals(lastBlockIndex) || preferredDir == Dir.NONE) {
+            List<Dir> possibleDirList = getPossibleDirList(blockIndex);
+            int minPath = Integer.MAX_VALUE;
+            Dir result = Dir.NONE;
+            for (Dir possibleDir : possibleDirList) {
+                int bfs = bfs(getNextBlockIndex(possibleDir, blockIndex), pacContext.getPacField().getBotHome(), prepareKeyField());
+                if (bfs < minPath) {
+                    minPath = bfs;
+                    result = possibleDir;
+                }
+            }
+            if(minPath==0){
+                initRespawn();
+                gateKey = false;
+            }
+            setPreferredDir(result);
+        }
+    }
+
+    private void randomMotion() {
+        Coord<Integer> blockIndex = getBlockIndex();
+        if (!blockIndex.equals(lastBlockIndex) || preferredDir == Dir.NONE) {
+            List<Dir> possibleDirList = getPossibleDirList(blockIndex);
             Dir reverseDir = getReverseDir(preferredDir);
             possibleDirList.remove(reverseDir);
             if (possibleDirList.size() > 0) {
@@ -122,15 +170,16 @@ public class Bot extends Actor implements IRenderObject {
                 setPreferredDir(reverseDir);
             }
         }
-        super.update(time);
     }
 
     @Override
     public void render(Graphics2D g) {
-        if(immortal) {
-            g.setColor(Color.BLUE);
-        }else{
+        g.setColor(Color.BLUE);
+        if(!immortal) {
             g.setColor(Color.MAGENTA);
+        }
+        if(dead){
+            g.setColor(Color.WHITE);
         }
         AffineTransform transform = g.getTransform();
         Coord<Double> currentCoord = getCurrentCoord();
