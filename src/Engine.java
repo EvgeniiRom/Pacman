@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
@@ -36,7 +35,7 @@ public class Engine {
     }
 
 
-    public void restartObjects() {
+    public void startObjects() {
         synchronized (worldObjectsMap) {
             Collection<IWorldObject> worldObjects = worldObjectsMap.values();
             for (IWorldObject iWorldObject : worldObjects) {
@@ -50,6 +49,7 @@ public class Engine {
             logger.info("engine already started");
             return;
         }
+        startObjects();
         updateThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -91,6 +91,7 @@ public class Engine {
                 iWorldObject.finish();
             }
         }
+        started = false;
     }
 
     public List<IWorldObject> getWorldObjectListByClass(Class c){

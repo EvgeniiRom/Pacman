@@ -7,7 +7,7 @@ public abstract class Actor implements IWorldObject {
     private Coord<Double> startCoord = new Coord<>(15d, 15d);
     private Coord<Double> targetCoord = new Coord<>(15d, 15d);
     private Coord<Double> currentCoord = new Coord<>(15d, 15d);
-    private Coord<Double> preferredCoord = new Coord<>(15d, 15d);
+    private Coord<Double> defauldCoord = new Coord<>(15d, 15d);
     private String id;
 
     protected double velosity = 100d;
@@ -57,16 +57,16 @@ public abstract class Actor implements IWorldObject {
         return Dir.NONE;
     }
 
-    public void setPreferredLocationToBlock(Coord<Integer> blockIndex) {
+    public void setDefaultLocationToBlock(Coord<Integer> blockIndex) {
         int blockSize = pacContext.getBlockSize();
-        preferredCoord = new Coord<Double>(blockSize * (blockIndex.x + 0.5d), blockSize * (blockIndex.y + 0.5d));
+        defauldCoord = new Coord<Double>(blockSize * (blockIndex.x + 0.5d), blockSize * (blockIndex.y + 0.5d));
     }
 
     @Override
     public void start() {
-        currentCoord = preferredCoord.clone();
-        startCoord = preferredCoord.clone();
-        targetCoord = preferredCoord.clone();
+        currentCoord = defauldCoord.clone();
+        startCoord = defauldCoord.clone();
+        targetCoord = defauldCoord.clone();
         preferredDir = Dir.NONE;
         dir = Dir.NONE;
     }

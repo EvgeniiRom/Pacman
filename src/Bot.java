@@ -20,13 +20,19 @@ public class Bot extends Actor implements IRenderObject {
         setGateKey(true);
     }
 
-    public void setImmortal(boolean immortal) {
-        this.immortal = immortal;
-        if(immortal){
-            velosity = defV;
-        }else {
+    private void updateVelosity(){
+        velosity = defV;
+        if(!immortal){
             velosity = 50d;
         }
+        if(dead){
+            velosity = 200d;
+        }
+    }
+
+    public void setImmortal(boolean immortal) {
+        this.immortal = immortal;
+        updateVelosity();
     }
 
     @Override
@@ -34,11 +40,11 @@ public class Bot extends Actor implements IRenderObject {
         super.start();
         lastBlockIndex = getBlockIndex();
         preferredDir = Dir.NONE;
-        velosity = defV;
+        updateVelosity();
     }
 
     private int bfs(Coord<Integer> startBlock, Coord<Integer> target, boolean[][] used) {
-        if(startBlock.equals(target)){
+        if (startBlock.equals(target)) {
             return 0;
         }
         Queue<Pair<Coord<Integer>, Integer>> queue = new LinkedList<>();
@@ -87,27 +93,27 @@ public class Bot extends Actor implements IRenderObject {
         return getRandomDir(possibleDirList);
     }
 
-    boolean meetPlayer(){
+    boolean meetPlayer() {
         Coord<Double> playerCoord = pacContext.getPlayer().getCurrentCoord();
         Coord<Double> coord = getCurrentCoord();
         double dx = playerCoord.x - coord.x;
         double dy = playerCoord.y - coord.y;
-        return Math.sqrt(dx*dx + dy*dy)<eatDistance;
+        return Math.sqrt(dx * dx + dy * dy) < eatDistance;
     }
 
-    private void death(){
+    private void death() {
         dead = true;
-        velosity = 200d;
+        updateVelosity();
     }
 
-    public void initRespawn(){
+    public void initRespawn() {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 dead = false;
                 immortal = true;
                 gateKey = true;
-                velosity = defV;
+                updateVelosity();
             }
         };
         Timer timer = new Timer();
@@ -116,21 +122,21 @@ public class Bot extends Actor implements IRenderObject {
 
     @Override
     public void update(long time) {
-        if(time==0){
+        if (time == 0) {
             return;
         }
         GameManager gameManager = pacContext.getGameManager();
         Coord<Integer> blockIndex = getBlockIndex();
-        if(meetPlayer()){
-            if(immortal) {
+        if (meetPlayer()) {
+            if (immortal) {
                 gameManager.killPlayer();
-            }else {
+            } else {
                 death();
             }
         }
-        if(dead && gateKey){
+        if (dead && gateKey) {
             goHome();
-        }else{
+        } else {
             randomMotion();
         }
         lastBlockIndex = blockIndex;
@@ -150,7 +156,7 @@ public class Bot extends Actor implements IRenderObject {
                     result = possibleDir;
                 }
             }
-            if(minPath==0){
+            if (minPath == 0) {
                 initRespawn();
                 gateKey = false;
             }
@@ -175,10 +181,10 @@ public class Bot extends Actor implements IRenderObject {
     @Override
     public void render(Graphics2D g) {
         g.setColor(Color.BLUE);
-        if(!immortal) {
+        if (!immortal) {
             g.setColor(Color.MAGENTA);
         }
-        if(dead){
+        if (dead) {
             g.setColor(Color.WHITE);
         }
         AffineTransform transform = g.getTransform();

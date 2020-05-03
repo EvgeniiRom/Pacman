@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 public class GameManager {
@@ -10,6 +12,7 @@ public class GameManager {
     private PacContext pacContext;
     private Thread updatePanelThread = null;
     private boolean gameStarted = false;
+    private Timer boostTimer = null;
     private List<GameListener> listenerList = new ArrayList<>();
 
     private Logger logger = Logger.getLogger(GameManager.class.getName());
@@ -28,19 +31,19 @@ public class GameManager {
 
     private void createWorldObjects() {
         Coord<Integer> playerBlock = pacContext.getPacField().getPlayer();
-        Player player = new Player(pacContext,"player");
-        player.setPreferredLocationToBlock(playerBlock);
+        Player player = new Player(pacContext, "player");
+        player.setDefaultLocationToBlock(playerBlock);
         engine.addWorldObject(player);
         renderer.addRenderObject(player);
         pacContext.setPlayer(player);
 
         List<Coord<Integer>> bots = pacContext.getPacField().getBots();
         int botCount = bots.size();
-        for (int i = 0; i<botCount; i++) {
+        for (int i = 0; i < botCount; i++) {
             Coord<Integer> coord = bots.get(i);
             String id = "bot_" + i;
             Bot bot = new Bot(pacContext, id);
-            bot.setPreferredLocationToBlock(coord);
+            bot.setDefaultLocationToBlock(coord);
             engine.addWorldObject(bot);
             renderer.addRenderObject(bot);
         }
@@ -48,7 +51,7 @@ public class GameManager {
         List<Coord<Integer>> sweets = pacContext.getPacField().getSweets();
         int blockSize = pacContext.getBlockSize();
         int sweetCount = sweets.size();
-        for (int i = 0; i<sweetCount; i++) {
+        for (int i = 0; i < sweetCount; i++) {
             Coord<Integer> coord = sweets.get(i);
             Coord<Double> sweetCoord = new Coord<>((coord.x + 0.5) * blockSize, (coord.y + 0.5) * blockSize);
             String id = "sweet_" + i;
@@ -59,7 +62,7 @@ public class GameManager {
 
         List<Coord<Integer>> boosts = pacContext.getPacField().getBoosts();
         int boostCount = boosts.size();
-        for (int i = 0; i<boostCount; i++) {
+        for (int i = 0; i < boostCount; i++) {
             Coord<Integer> coord = boosts.get(i);
             Coord<Double> boostCoord = new Coord<>((coord.x + 0.5) * blockSize, (coord.y + 0.5) * blockSize);
             String id = "boost_" + i;
@@ -73,13 +76,13 @@ public class GameManager {
         return pacContext;
     }
 
-    public void addGameListener(GameListener listener){
+    public void addGameListener(GameListener listener) {
         listenerList.add(listener);
     }
 
-    public void startGame(){
+    public void startGame() {
         createWorldObjects();
-        if(!gameStarted) {
+        if (!gameStarted) {
             updatePanelThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -97,28 +100,28 @@ public class GameManager {
             engine.start();
             gameStarted = true;
             logger.info("game started");
-        }else{
+        } else {
             logger.info("game already started");
         }
     }
 
-    public void stopGame(){
-        if(gameStarted) {
+    public void stopGame() {
+        if (gameStarted) {
             updatePanelThread.interrupt();
             engine.stop();
             gameStarted = false;
             logger.info("game stopped");
-        }else{
+        } else {
             logger.info("game is not started");
         }
     }
 
-    public void removeObject(String id){
+    public void removeObject(String id) {
         engine.removeWorldObject(id);
         renderer.removeRenderObject(id);
     }
 
-    public void incrementScore(int score){
+    public void incrementScore(int score) {
         int value = pacContext.getScore() + score;
         pacContext.setScore(value);
         for (GameListener gameListener : listenerList) {
@@ -126,7 +129,7 @@ public class GameManager {
         }
     }
 
-    public void killPlayer(){
+    public void killPlayer() {
         engine.pause();
         int lives = pacContext.getLives();
         lives--;
@@ -134,23 +137,44 @@ public class GameManager {
         for (GameListener gameListener : listenerList) {
             gameListener.onLiveChange(lives);
         }
-        if(lives==0) {
+        if (lives == 0) {
             gameOver();
-        }else{
-            engine.restartObjects();
+        } else {
+            engine.startObjects();
             engine.resume();
         }
     }
 
-    private void gameOver(){
+    private void gameOver() {
 
     }
 
-    public void boost(){
-        List<IWorldObject> bots = engine.getWorldObjectListByClass(Bot.class);
-        for (IWorldObject object : bots) {
-            Bot bot = (Bot) object;
-            bot.setImmortal(false);
+    private void createBoostTimer() {
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                boostTimer = null;
+                List<IWorldObject> bots = engine.getWorldObjectListByClass(Bot.class);
+                for (IWorldObject object : bots) {
+                    Bot bot = (Bot) object;
+                    bot.setImmortal(true);
+                }
+            }
+        };
+        boostTimer = new Timer();
+        boostTimer.schedule(timerTask, 5000);
+    }
+
+    public void boost() {
+        if (boostTimer == null) {
+            List<IWorldObject> bots = engine.getWorldObjectListByClass(Bot.class);
+            for (IWorldObject object : bots) {
+                Bot bot = (Bot) object;
+                bot.setImmortal(false);
+            }
+        } else {
+            boostTimer.cancel();
         }
+        createBoostTimer();
     }
 }
