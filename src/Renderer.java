@@ -12,9 +12,9 @@ public class Renderer {
         this.pacContext = pacContext;
     }
 
-    public void addRenderObject(String id, IRenderObject renderObject){
+    public void addRenderObject(IRenderObject renderObject){
         synchronized (renderObjectMap){
-            renderObjectMap.put(id, renderObject);
+            renderObjectMap.put(renderObject.getId(), renderObject);
         }
     }
 

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class Engine {
@@ -13,9 +14,9 @@ public class Engine {
 
     private Map<String, IWorldObject> worldObjectsMap = new HashMap<>();
 
-    public void addWorldObject(String id, IWorldObject object) {
+    public void addWorldObject(IWorldObject object) {
         synchronized (worldObjectsMap) {
-            worldObjectsMap.put(id, object);
+            worldObjectsMap.put(object.getId(), object);
         }
     }
 
@@ -90,5 +91,18 @@ public class Engine {
                 iWorldObject.finish();
             }
         }
+    }
+
+    public List<IWorldObject> getWorldObjectListByClass(Class c){
+        List<IWorldObject> result = new ArrayList<>();
+        synchronized (worldObjectsMap) {
+            Collection<IWorldObject> worldObjects = worldObjectsMap.values();
+            for (IWorldObject iWorldObject : worldObjects) {
+                if(c.isInstance(iWorldObject)){
+                    result.add(iWorldObject);
+                }
+            }
+        }
+        return result;
     }
 }

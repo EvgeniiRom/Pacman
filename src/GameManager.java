@@ -28,21 +28,21 @@ public class GameManager {
 
     private void createWorldObjects() {
         Coord<Integer> playerBlock = pacContext.getPacField().getPlayer();
-        Player player = new Player(pacContext);
+        Player player = new Player(pacContext,"player");
         player.setPreferredLocationToBlock(playerBlock);
-        engine.addWorldObject("player", player);
-        renderer.addRenderObject("player", player);
+        engine.addWorldObject(player);
+        renderer.addRenderObject(player);
         pacContext.setPlayer(player);
 
         List<Coord<Integer>> bots = pacContext.getPacField().getBots();
         int botCount = bots.size();
         for (int i = 0; i<botCount; i++) {
             Coord<Integer> coord = bots.get(i);
-            Bot bot = new Bot(pacContext);
-            bot.setPreferredLocationToBlock(coord);
             String id = "bot_" + i;
-            engine.addWorldObject(id, bot);
-            renderer.addRenderObject(id, bot);
+            Bot bot = new Bot(pacContext, id);
+            bot.setPreferredLocationToBlock(coord);
+            engine.addWorldObject(bot);
+            renderer.addRenderObject(bot);
         }
 
         List<Coord<Integer>> sweets = pacContext.getPacField().getSweets();
@@ -53,8 +53,19 @@ public class GameManager {
             Coord<Double> sweetCoord = new Coord<>((coord.x + 0.5) * blockSize, (coord.y + 0.5) * blockSize);
             String id = "sweet_" + i;
             Sweet sweet = new Sweet(pacContext, sweetCoord, id);
-            engine.addWorldObject(id, sweet);
-            renderer.addRenderObject(id, sweet);
+            engine.addWorldObject(sweet);
+            renderer.addRenderObject(sweet);
+        }
+
+        List<Coord<Integer>> boosts = pacContext.getPacField().getBoosts();
+        int boostCount = boosts.size();
+        for (int i = 0; i<boostCount; i++) {
+            Coord<Integer> coord = boosts.get(i);
+            Coord<Double> boostCoord = new Coord<>((coord.x + 0.5) * blockSize, (coord.y + 0.5) * blockSize);
+            String id = "boost_" + i;
+            Boost boost = new Boost(pacContext, boostCoord, id);
+            engine.addWorldObject(boost);
+            renderer.addRenderObject(boost);
         }
     }
 
@@ -133,5 +144,13 @@ public class GameManager {
 
     private void gameOver(){
 
+    }
+
+    public void boost(){
+        List<IWorldObject> bots = engine.getWorldObjectListByClass(Bot.class);
+        for (IWorldObject object : bots) {
+            Bot bot = (Bot) object;
+            bot.setImmortal(false);
+        }
     }
 }

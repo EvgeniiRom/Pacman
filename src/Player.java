@@ -5,8 +5,8 @@ public class Player extends Actor implements IRenderObject{
     private int w = 32;
     private int h = 32;
 
-    public Player(PacContext pacContext) {
-        super(pacContext);
+    public Player(PacContext pacContext, String id) {
+        super(pacContext, id);
     }
 
     @Override

@@ -8,14 +8,22 @@ public abstract class Actor implements IWorldObject {
     private Coord<Double> targetCoord = new Coord<>(15d, 15d);
     private Coord<Double> currentCoord = new Coord<>(15d, 15d);
     private Coord<Double> preferredCoord = new Coord<>(15d, 15d);
-    protected double defV = 100d;
+    private String id;
+
+    protected double velosity = 100d;
     public boolean gateKey = false;
 
     protected Dir dir = Dir.NONE;
     protected Dir preferredDir = Dir.NONE;
 
-    public Actor(PacContext pacContext) {
+    public Actor(PacContext pacContext, String id) {
         this.pacContext = pacContext;
+        this.id = id;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     public Coord<Double> getCurrentCoord() {
@@ -114,7 +122,7 @@ public abstract class Actor implements IWorldObject {
 
     @Override
     public void update(long time) {
-        pathOffset += defV * time / 1000d;
+        pathOffset += velosity * time / 1000d;
         double needGo = Math.max(Math.abs(targetCoord.x - startCoord.x), Math.abs(targetCoord.y - startCoord.y));
         double donePercent = pathOffset / needGo;
 

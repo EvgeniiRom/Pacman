@@ -2,7 +2,6 @@ import javafx.util.Pair;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.security.spec.RSAOtherPrimeInfo;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -12,10 +11,22 @@ public class Bot extends Actor implements IRenderObject {
     private int w = 32;
     private int h = 32;
     private double eatDistance = 20d;
+    private double defV = 90d;
+    private boolean immortal = true;
 
-    public Bot(PacContext pacContext) {
-        super(pacContext);
+
+    public Bot(PacContext pacContext, String id) {
+        super(pacContext, id);
         setGateKey(true);
+    }
+
+    public void setImmortal(boolean immortal) {
+        this.immortal = immortal;
+        if(immortal){
+            velosity = defV;
+        }else {
+            velosity = 50d;
+        }
     }
 
     @Override
@@ -23,7 +34,7 @@ public class Bot extends Actor implements IRenderObject {
         super.start();
         currentBlock = getBlockIndex();
         preferredDir = Dir.NONE;
-        defV = 90d;
+        velosity = defV;
     }
 
     private int bfs(Coord<Integer> startBlock, Coord<Integer> target, boolean[][] used) {
@@ -86,7 +97,17 @@ public class Bot extends Actor implements IRenderObject {
         double dy = playerCoord.y - coord.y;
         if(Math.sqrt(dx*dx + dy*dy)<eatDistance){
             GameManager gameManager = pacContext.getGameManager();
-            gameManager.killPlayer();
+            if(immortal) {
+                gameManager.killPlayer();
+            }else{
+                //TODO respawn
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        gameManager.removeObject(getId());
+                    }
+                }).start();
+            }
         }
 
         Coord<Integer> blockIndex = getBlockIndex();
@@ -106,7 +127,11 @@ public class Bot extends Actor implements IRenderObject {
 
     @Override
     public void render(Graphics2D g) {
-        g.setColor(Color.BLUE);
+        if(immortal) {
+            g.setColor(Color.BLUE);
+        }else{
+            g.setColor(Color.MAGENTA);
+        }
         AffineTransform transform = g.getTransform();
         Coord<Double> currentCoord = getCurrentCoord();
         g.translate(currentCoord.x, currentCoord.y);

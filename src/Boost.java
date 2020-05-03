@@ -1,13 +1,13 @@
 import java.awt.*;
 
-public class Sweet implements IWorldObject, IRenderObject {
+public class Boost implements IWorldObject, IRenderObject {
     private PacContext pacContext;
-    private int r = 4;
+    private int r = 8;
     private Coord<Double> coord = new Coord<>(0d,0d);
     private String id;
     private double eatDistance = 16d;
 
-    public Sweet(PacContext pacContext, Coord<Double> coord, String id) {
+    public Boost(PacContext pacContext, Coord<Double> coord, String id) {
         this.pacContext = pacContext;
         this.coord = coord;
         this.id = id;
@@ -37,6 +37,7 @@ public class Sweet implements IWorldObject, IRenderObject {
         if(Math.sqrt(dx*dx + dy*dy)<eatDistance){
             GameManager gameManager = pacContext.getGameManager();
             gameManager.incrementScore(10);
+            gameManager.boost();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
