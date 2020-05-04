@@ -1,7 +1,10 @@
 import javafx.util.Pair;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -14,14 +17,18 @@ public class Bot extends Actor implements IRenderObject {
     private double defV = 90d;
     private boolean immortal = true;
     private boolean dead = false;
-    private Animator animator;
+    private Animator mainAnimator;
+    private Animator mortalAnimator;
+    private BufferedImage deadImage;
     private long timeOffset = 0l;
 
 
     public Bot(PacContext pacContext, String id) throws IOException {
         super(pacContext, id);
         setGateKey(true);
-        animator = new Animator("images/bot/", 4);
+        mainAnimator = new Animator("images/bot/main/", 4);
+        mortalAnimator = new Animator("images/bot/mortal/", 4);
+        deadImage = ImageIO.read(new File("images/bot/dead.png"));
     }
 
     private void updateVelosity(){
@@ -183,6 +190,10 @@ public class Bot extends Actor implements IRenderObject {
         }
     }
 
+    private void getCurrentFrame(){
+
+    }
+
     @Override
     public void render(Graphics2D g) {
         g.setColor(Color.BLUE);
@@ -195,7 +206,21 @@ public class Bot extends Actor implements IRenderObject {
         AffineTransform transform = g.getTransform();
         Coord<Double> currentCoord = getCurrentCoord();
         g.translate(currentCoord.x, currentCoord.y);
-        g.drawImage(animator.getCurrentFrame(timeOffset),-w / 2, -h / 2, w, h, null);
+        if(dir.equals(Dir.LEFT) || dir.equals(Dir.DOWN)) {
+            g.transform(new AffineTransform(-1d, 0d, 0d, 1d, 0d, 0d));
+        }
+
+        BufferedImage currentFrame = null;
+        if(immortal){
+            currentFrame = mainAnimator.getCurrentFrame(timeOffset);
+        }else{
+            currentFrame = mortalAnimator.getCurrentFrame(timeOffset);
+        }
+        if(dead){
+            currentFrame = deadImage;
+        }
+
+        g.drawImage(currentFrame,-w / 2, -h / 2, w, h, null);
         g.setTransform(transform);
     }
 }
