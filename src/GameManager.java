@@ -42,10 +42,14 @@ public class GameManager {
         for (int i = 0; i < botCount; i++) {
             Coord<Integer> coord = bots.get(i);
             String id = "bot_" + i;
-            Bot bot = new Bot(pacContext, id);
-            bot.setDefaultLocationToBlock(coord);
-            engine.addWorldObject(bot);
-            renderer.addRenderObject(bot);
+            try {
+                Bot bot = new Bot(pacContext, id);
+                bot.setDefaultLocationToBlock(coord);
+                engine.addWorldObject(bot);
+                renderer.addRenderObject(bot);
+            } catch (IOException e) {
+                logger.info(e.getMessage());
+            }
         }
 
         List<Coord<Integer>> sweets = pacContext.getPacField().getSweets();

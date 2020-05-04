@@ -59,13 +59,13 @@ public class Renderer {
             for (int j = 0; j < columnCount; j++) {
                 int block = row[j];
                 if (block == 0) {
-                    g.setColor(new Color(46, 178, 90));
-                }
-                if (block == 1) {
                     g.setColor(new Color(0, 0, 0));
                 }
-                if (block == 2) {
+                if (block == 1) {
                     g.setColor(new Color(0, 161, 212));
+                }
+                if (block == 2) {
+                    g.setColor(new Color(212, 125, 77));
                 }
                 g.fillRect(blockSize*j, blockSize*i, blockSize, blockSize);
             }

@@ -2,22 +2,26 @@ import javafx.util.Pair;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
 public class Bot extends Actor implements IRenderObject {
     private Coord<Integer> lastBlockIndex;
-    private int w = 32;
-    private int h = 32;
+    private int w = 64;
+    private int h = 64;
     private double eatDistance = 20d;
     private double defV = 90d;
     private boolean immortal = true;
     private boolean dead = false;
+    private Animator animator;
+    private long timeOffset = 0l;
 
 
-    public Bot(PacContext pacContext, String id) {
+    public Bot(PacContext pacContext, String id) throws IOException {
         super(pacContext, id);
         setGateKey(true);
+        animator = new Animator("images/bot/", 4);
     }
 
     private void updateVelosity(){
@@ -125,6 +129,7 @@ public class Bot extends Actor implements IRenderObject {
         if (time == 0) {
             return;
         }
+        timeOffset+=time;
         GameManager gameManager = pacContext.getGameManager();
         Coord<Integer> blockIndex = getBlockIndex();
         if (meetPlayer()) {
@@ -190,7 +195,7 @@ public class Bot extends Actor implements IRenderObject {
         AffineTransform transform = g.getTransform();
         Coord<Double> currentCoord = getCurrentCoord();
         g.translate(currentCoord.x, currentCoord.y);
-        g.fillOval(-w / 2, -h / 2, w, h);
+        g.drawImage(animator.getCurrentFrame(timeOffset),-w / 2, -h / 2, w, h, null);
         g.setTransform(transform);
     }
 }
