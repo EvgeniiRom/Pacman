@@ -6,10 +6,9 @@ import java.util.logging.Logger;
 
 public class MainForm extends JFrame implements GameListener{
     private JPanel contentPane;
-    private JButton startButton;
-    private JButton stopButton;
     private JLabel scoreLabel;
     private JLabel livesLabel;
+    private JCheckBox checkBox1;
 
     private GameManager gameManager;
     private Logger logger = Logger.getLogger(MainForm.class.getName());
@@ -26,18 +25,7 @@ public class MainForm extends JFrame implements GameListener{
 
     private void init() throws IOException {
         setContentPane(contentPane);
-        getRootPane().setDefaultButton(startButton);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        startButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onStart();
-            }
-        });
-        stopButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onStop();
-            }
-        });
         gameManager = new GameManager();
         gameManager.addGameListener(this);
         PacContext pacContext = gameManager.getPacContext();
@@ -100,14 +88,6 @@ public class MainForm extends JFrame implements GameListener{
         logger.info("right");
         gameManager.getPacContext().getPlayer().setPreferredDir(Actor.Dir.RIGHT);
     }
-    private void onStart() {
-        logger.info("start");
-        gameManager.startGame();
-    }
-    private void onStop() {
-        logger.info("stop");
-        gameManager.stopGame();
-    }
     private void onPause() {
         logger.info("pause");
         gameManager.pauseGame();
@@ -121,5 +101,18 @@ public class MainForm extends JFrame implements GameListener{
     @Override
     public void onLiveChange(int lives) {
         livesLabel.setText(Integer.toString(lives));
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+        checkBox1 = new JCheckBox(){
+            @Override
+            public void paint(Graphics g) {
+                //super.paint(g);
+                Dimension size = getSize();
+                g.setColor(Color.BLACK);
+                g.fillRect(0,0, size.width, size.height);
+            }
+        };
     }
 }

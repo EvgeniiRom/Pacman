@@ -84,10 +84,24 @@ public class GameManager {
         listenerList.add(listener);
     }
 
+    private void fireScore(){
+        for (GameListener gameListener : listenerList) {
+            gameListener.onScoreChange(pacContext.getScore());
+        }
+    }
+
+    private void fireLives(){
+        for (GameListener gameListener : listenerList) {
+            gameListener.onLiveChange(pacContext.getLives());
+        }
+    }
+
     public void restartGame() {
         engine.pause();
         removeAllObject();
         pacContext.setDefaultValues();
+        fireLives();
+        fireScore();
         try {
             createWorldObjects();
             engine.startObjects();
@@ -101,6 +115,8 @@ public class GameManager {
     public void startGame() {
         removeAllObject();
         pacContext.setDefaultValues();
+        fireLives();
+        fireScore();
         try {
             createWorldObjects();
             engine.startObjects();
@@ -167,9 +183,7 @@ public class GameManager {
     public void incrementScore(int score) {
         int value = pacContext.getScore() + score;
         pacContext.setScore(value);
-        for (GameListener gameListener : listenerList) {
-            gameListener.onScoreChange(value);
-        }
+        fireScore();
     }
 
     public void killPlayer() {
@@ -177,9 +191,7 @@ public class GameManager {
         int lives = pacContext.getLives();
         lives--;
         pacContext.setLives(lives);
-        for (GameListener gameListener : listenerList) {
-            gameListener.onLiveChange(lives);
-        }
+        fireLives();
         if (lives == 0) {
             gameOver();
         } else {

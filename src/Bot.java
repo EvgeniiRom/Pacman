@@ -72,7 +72,10 @@ public class Bot extends Actor implements IRenderObject {
                 }
                 for (Dir nextDir : dirs) {
                     Coord<Integer> nextBlockIndex = getNextBlockIndex(nextDir, blockIndex);
-                    int nextBlock = pacContext.getPacField().getBlock(nextBlockIndex);
+                    int nextBlock = 1;
+                    if(pacContext.getPacField().validBlockIndex(nextBlockIndex)) {
+                        nextBlock = pacContext.getPacField().getBlock(nextBlockIndex);
+                    }
                     if (!nextBlockIndex.equals(blockIndex) &&
                             (nextBlock == 0 || nextBlock == 2 && gateKey) &&
                             !used[nextBlockIndex.y][nextBlockIndex.x]) {

@@ -110,7 +110,7 @@ public abstract class Actor implements IWorldObject {
         return blockIndex;
     }
 
-    protected Coord<Double> getNextCoord(Dir dir) {
+    protected Coord<Double> getNextCoord() {
         Coord<Integer> blockIndex = getNextBlockIndex(preferredDir, getBlockIndex());
         int blockSize = pacContext.getBlockSize();
         int block = pacContext.getPacField().getBlock(blockIndex);
@@ -173,7 +173,7 @@ public abstract class Actor implements IWorldObject {
             pathOffset = 0;
             startCoord = targetCoord.clone();
             currentCoord = targetCoord.clone();
-            targetCoord = getNextCoord(preferredDir);
+            targetCoord = getNextCoord();
             if(targetCoord.equals(currentCoord)){
                 preferredDir = Dir.NONE;
             }
