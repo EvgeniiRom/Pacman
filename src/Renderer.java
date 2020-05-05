@@ -68,9 +68,11 @@ public class Renderer {
                 int block = row[j];
                 g.setColor(new Color(0, 0, 0));
                 g.fillRect(blockSize * j, blockSize * i, blockSize, blockSize);
-
-                if (block == 1) {
-                    g.setColor(new Color(0, 161, 212));
+                if (block == 1 || block == 2) {
+                    g.setColor(Color.GREEN);
+                    if(block==1) {
+                        g.setColor(new Color(0, 161, 212));
+                    }
                     g.setStroke(new BasicStroke(4f));
                     int x = (int) (blockSize * (j + 0.5d));
                     int y = (int) (blockSize * (i + 0.5d));
