@@ -6,6 +6,7 @@ public class Sweet implements IWorldObject, IRenderObject {
     private Coord<Double> coord = new Coord<>(0d,0d);
     private String id;
     private double eatDistance = 16d;
+    private int zIndex = 50;
 
     public Sweet(PacContext pacContext, Coord<Double> coord, String id) {
         this.pacContext = pacContext;
@@ -16,6 +17,11 @@ public class Sweet implements IWorldObject, IRenderObject {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public int getZIndex() {
+        return zIndex;
     }
 
     @Override

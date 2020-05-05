@@ -1,5 +1,3 @@
-import sun.text.resources.iw.FormatData_iw_IL;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,15 +46,15 @@ public class PacField {
         return botHome;
     }
 
-    public int getBlock(Coord<Integer> blockIndex){
-        if(!validBlockIndex(blockIndex)){
+    public int getBlock(Coord<Integer> blockIndex) {
+        if (!validBlockIndex(blockIndex)) {
             return -1;
         }
         return field[blockIndex.y][blockIndex.x];
     }
 
     public boolean validBlockIndex(Coord<Integer> blockIndex) {
-        return blockIndex.x >= 0 && blockIndex.x <  width && blockIndex.y >= 0 && blockIndex.y < height;
+        return blockIndex.x >= 0 && blockIndex.x < width && blockIndex.y >= 0 && blockIndex.y < height;
     }
 
     public void read(String path) throws IOException {
@@ -103,7 +101,6 @@ public class PacField {
                 }
             }
         }
-
 
         bufferedReader.close();
     }

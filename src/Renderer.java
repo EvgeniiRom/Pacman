@@ -1,12 +1,15 @@
+import javafx.collections.transformation.SortedList;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 public class Renderer {
     private PacContext pacContext;
     private Map<String, IRenderObject> renderObjectMap = new HashMap<>();
+    private List<IRenderObject> sortedSet = new ArrayList<>();
+    private Comparator<IRenderObject> renderObjectComparator = new RenderObjectComparator();
 
     public Renderer(PacContext pacContext) {
         this.pacContext = pacContext;
@@ -15,17 +18,21 @@ public class Renderer {
     public void addRenderObject(IRenderObject renderObject){
         synchronized (renderObjectMap){
             renderObjectMap.put(renderObject.getId(), renderObject);
+            sortedSet.add(renderObject);
+            sortedSet.sort(renderObjectComparator);
         }
     }
 
     public void removeRenderObject(String id){
         synchronized (renderObjectMap){
+            sortedSet.remove(renderObjectMap.get(id));
             renderObjectMap.remove(id);
         }
     }
 
     public void removeAllObjects() {
         synchronized (renderObjectMap) {
+            sortedSet.clear();
             renderObjectMap.clear();
         }
     }
@@ -37,13 +44,11 @@ public class Renderer {
         int fieldWidth = pacField.getWidth();
         double yScale = size.getHeight()/(fieldHeight*blockSize);
         double xScale = size.getWidth()/(fieldWidth*blockSize);
-
         AffineTransform transform = g.getTransform();
         g.scale(xScale, yScale);
         renderField(g, pacField.getField());
         synchronized (renderObjectMap) {
-            Collection<IRenderObject> renderObjectArray = renderObjectMap.values();
-            for (IRenderObject renderObject : renderObjectArray) {
+            for (IRenderObject renderObject : sortedSet) {
                 renderObject.render(g);
             }
         }

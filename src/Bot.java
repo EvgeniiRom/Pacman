@@ -21,6 +21,7 @@ public class Bot extends Actor implements IRenderObject {
     private Animator mortalAnimator;
     private BufferedImage deadImage;
     private long timeOffset = 0l;
+    private int zIndex = 100;
 
 
     public Bot(PacContext pacContext, String id) throws IOException {
@@ -222,5 +223,10 @@ public class Bot extends Actor implements IRenderObject {
 
         g.drawImage(currentFrame,-w / 2, -h / 2, w, h, null);
         g.setTransform(transform);
+    }
+
+    @Override
+    public int getZIndex() {
+        return zIndex;
     }
 }

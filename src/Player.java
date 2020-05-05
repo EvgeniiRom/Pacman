@@ -11,6 +11,7 @@ public class Player extends Actor implements IRenderObject{
     private Animator fontAnimator;
     private Animator rearAnimator;
     private Animator currentAnimator;
+    private int zIndex = 200;
 
     public Player(PacContext pacContext, String id) throws IOException {
         super(pacContext, id);
@@ -50,5 +51,10 @@ public class Player extends Actor implements IRenderObject{
         }
         g.drawImage(currentAnimator.getCurrentFrame(timeOffset),-w / 2, -h / 2, w, h, null);
         g.setTransform(transform);
+    }
+
+    @Override
+    public int getZIndex() {
+        return zIndex;
     }
 }
