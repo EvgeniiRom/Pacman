@@ -120,14 +120,46 @@ public abstract class Actor implements IWorldObject {
         return startCoord.clone();
     }
 
-    @Override
-    public void update(long time) {
-        pathOffset += velosity * time / 1000d;
-        double needGo = Math.max(Math.abs(targetCoord.x - startCoord.x), Math.abs(targetCoord.y - startCoord.y));
-        double donePercent = pathOffset / needGo;
+
+    private void updateCurrentCoord(double donePercent){
+        PacField pacField = pacContext.getPacField();
+        int blockSize = pacContext.getBlockSize();
+        double width = pacField.getWidth()*blockSize;
+        double height = pacField.getHeight()*blockSize;
 
         currentCoord.x = startCoord.x + (targetCoord.x - startCoord.x) * donePercent;
         currentCoord.y = startCoord.y + (targetCoord.y - startCoord.y) * donePercent;
+
+        if(currentCoord.x < 0){
+            currentCoord.x += width;
+            startCoord.x += width;
+            targetCoord.x += width;
+        }
+        if(currentCoord.x >= width){
+            currentCoord.x -= width;
+            startCoord.x -= width;
+            targetCoord.x -= width;
+        }
+        if(currentCoord.y < 0){
+            currentCoord.y += height;
+            startCoord.y += height;
+            targetCoord.y += height;
+        }
+        if(currentCoord.y >= height){
+            currentCoord.y -= height;
+            startCoord.y -= height;
+            targetCoord.y -= height;
+        }
+    }
+
+    @Override
+    public void update(long time) {
+        pathOffset += velosity * time / 1000d;
+
+        double needGo = Math.max(Math.abs(targetCoord.x - startCoord.x), Math.abs(targetCoord.y - startCoord.y));
+        double donePercent = pathOffset / needGo;
+
+        updateCurrentCoord(donePercent);
 
         if(preferredDir!=Dir.NONE && preferredDir == getReverseDir(dir)){
             Coord<Double> temp = targetCoord;

@@ -47,10 +47,13 @@ public class PacField {
     }
 
     public int getBlock(Coord<Integer> blockIndex) {
-        if (!validBlockIndex(blockIndex)) {
-            return -1;
-        }
-        return field[blockIndex.y][blockIndex.x];
+        return getBlock(blockIndex.x, blockIndex.y);
+    }
+
+    public int getBlock(int x, int y) {
+        x = (x+width)%width;
+        y = (y+height)%height;
+        return field[y][x];
     }
 
     public boolean validBlockIndex(Coord<Integer> blockIndex) {
