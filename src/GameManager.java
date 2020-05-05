@@ -74,6 +74,27 @@ public class GameManager {
             engine.addWorldObject(boost);
             renderer.addRenderObject(boost);
         }
+
+        ArrayList<Coord<Integer>> extraSweets = new ArrayList<>(sweets);
+        extraSweets.addAll(boosts);
+        int extraSweetOffset = sweetCount;
+        for (int i = 0; i < extraSweets.size(); i++) {
+            for (int j = i; j < extraSweets.size(); j++) {
+                if (i != j) {
+                    Coord<Integer> s1 = extraSweets.get(i);
+                    Coord<Integer> s2 = extraSweets.get(j);
+                    int dx = s2.x - s1.x;
+                    int dy = s2.y - s1.y;
+                    if (Math.abs(dx) + Math.abs(dy) == 1) {
+                        Coord<Double> coord = new Coord<>((s1.x + 0.5 + dx * 0.5) * blockSize, (s1.y + 0.5 + dy * 0.5) * blockSize);
+                        Sweet sweet = new Sweet(pacContext, coord, "sweet_" + extraSweetOffset++);
+                        engine.addWorldObject(sweet);
+                        renderer.addRenderObject(sweet);
+                    }
+                }
+            }
+        }
+
     }
 
     public PacContext getPacContext() {
@@ -84,13 +105,13 @@ public class GameManager {
         listenerList.add(listener);
     }
 
-    private void fireScore(){
+    private void fireScore() {
         for (GameListener gameListener : listenerList) {
             gameListener.onScoreChange(pacContext.getScore());
         }
     }
 
-    private void fireLives(){
+    private void fireLives() {
         for (GameListener gameListener : listenerList) {
             gameListener.onLiveChange(pacContext.getLives());
         }

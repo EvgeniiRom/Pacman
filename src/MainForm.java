@@ -8,7 +8,7 @@ public class MainForm extends JFrame implements GameListener{
     private JPanel contentPane;
     private JLabel scoreLabel;
     private JLabel livesLabel;
-    private JCheckBox checkBox1;
+    private JCheckBox fakeFocusableElement;
 
     private GameManager gameManager;
     private Logger logger = Logger.getLogger(MainForm.class.getName());
@@ -105,7 +105,7 @@ public class MainForm extends JFrame implements GameListener{
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
-        checkBox1 = new JCheckBox(){
+        fakeFocusableElement = new JCheckBox(){
             @Override
             public void paint(Graphics g) {
                 //super.paint(g);

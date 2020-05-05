@@ -60,7 +60,7 @@
               <text value="Lives: "/>
             </properties>
           </component>
-          <component id="c9c2e" class="javax.swing.JCheckBox" binding="checkBox1" custom-create="true" default-binding="true">
+          <component id="c9c2e" class="javax.swing.JCheckBox" binding="fakeFocusableElement" custom-create="true" default-binding="true">
             <constraints>
               <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
