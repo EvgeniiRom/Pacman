@@ -35,4 +35,12 @@ public class Animator {
     public BufferedImage getCurrentFrame(long timeOffset){
         return images[(int)(timeOffset*fps/1000d)%imageCount];
     }
+
+    public double getFps() {
+        return fps;
+    }
+
+    public void setFps(double fps) {
+        this.fps = fps;
+    }
 }

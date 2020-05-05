@@ -29,7 +29,7 @@ public class GameManager {
 
     }
 
-    private void createWorldObjects() {
+    private void createWorldObjects() throws IOException {
         Coord<Integer> playerBlock = pacContext.getPacField().getPlayer();
         Player player = new Player(pacContext, "player");
         player.setDefaultLocationToBlock(playerBlock);
@@ -84,52 +84,60 @@ public class GameManager {
         listenerList.add(listener);
     }
 
-    public void restartGame(){
+    public void restartGame() {
         engine.pause();
         removeAllObject();
         pacContext.setDefaultValues();
-        createWorldObjects();
-        engine.startObjects();
-        engine.resume();
-        gamePanel.setScene(GamePanel.Scene.GAMING);
+        try {
+            createWorldObjects();
+            engine.startObjects();
+            engine.resume();
+            gamePanel.setScene(GamePanel.Scene.GAMING);
+        } catch (IOException e) {
+            logger.info("Create world objects failed: " + e.getMessage());
+        }
     }
 
     public void startGame() {
         removeAllObject();
         pacContext.setDefaultValues();
-        createWorldObjects();
-        engine.startObjects();
-        if (!gameStarted) {
-            updatePanelThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        while (true) {
-                            Thread.sleep(10);
-                            gamePanel.repaint();
+        try {
+            createWorldObjects();
+            engine.startObjects();
+            if (!gameStarted) {
+                updatePanelThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            while (true) {
+                                Thread.sleep(10);
+                                gamePanel.repaint();
+                            }
+                        } catch (InterruptedException e) {
+                            logger.info("game panel update thread interrupted");
                         }
-                    } catch (InterruptedException e) {
-                        logger.info("game panel update thread interrupted");
                     }
-                }
-            });
-            updatePanelThread.start();
-            engine.start();
-            gameStarted = true;
-            gamePanel.setScene(GamePanel.Scene.GAMING);
-            logger.info("game started");
-        } else {
-            logger.info("game already started");
+                });
+                updatePanelThread.start();
+                engine.start();
+                gameStarted = true;
+                gamePanel.setScene(GamePanel.Scene.GAMING);
+                logger.info("game started");
+            } else {
+                logger.info("game already started");
+            }
+        } catch (IOException e) {
+            logger.info("Create world objects failed: " + e.getMessage());
         }
     }
 
 
-    public void pauseGame(){
+    public void pauseGame() {
         engine.pause();
         gamePanel.setScene(GamePanel.Scene.PAUSE);
     }
 
-    public void resumeGame(){
+    public void resumeGame() {
         engine.resume();
         gamePanel.setScene(GamePanel.Scene.GAMING);
     }
