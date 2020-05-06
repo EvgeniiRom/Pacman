@@ -10,6 +10,7 @@ public class MainForm extends JFrame implements ContextListener {
     private JLabel livesLabel;
     private JCheckBox fakeFocusableElement;
     private JLabel levelLabel;
+    private JLabel killsLabel;
 
     private GameManager gameManager;
     private Logger logger = Logger.getLogger(MainForm.class.getName());
@@ -107,6 +108,11 @@ public class MainForm extends JFrame implements ContextListener {
     @Override
     public void onLevelChange(int level) {
         levelLabel.setText(Integer.toString(level));
+    }
+
+    @Override
+    public void onKillsChange(int kills) {
+        killsLabel.setText(Integer.toString(kills));
     }
 
     private void createUIComponents() {

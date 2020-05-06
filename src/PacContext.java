@@ -11,6 +11,7 @@ public class PacContext {
     private int blockSize = 40;
     private int lives = 3;
     private int level = 1;
+    private int kills = 0;
 
     public PacContext(GameManager gameManager) throws IOException {
         this.gameManager = gameManager;
@@ -19,14 +20,16 @@ public class PacContext {
         pacField.printField();
     }
 
-    public void setDefaultValues(){
+    public void setDefaultValues() {
         score = 0;
         lives = 3;
         level = 1;
+        kills = 0;
         for (ContextListener contextListener : listenerList) {
             contextListener.onLevelChange(score);
             contextListener.onLevelChange(lives);
             contextListener.onLevelChange(level);
+            contextListener.onKillsChange(kills);
         }
     }
 
@@ -80,6 +83,17 @@ public class PacContext {
         this.level = level;
         for (ContextListener contextListener : listenerList) {
             contextListener.onLevelChange(level);
+        }
+    }
+
+    public int getKills() {
+        return kills;
+    }
+
+    public void setKills(int kills) {
+        this.kills = kills;
+        for (ContextListener contextListener : listenerList) {
+            contextListener.onKillsChange(kills);
         }
     }
 

@@ -38,4 +38,9 @@ public class GameOverForm implements ContextListener {
     public void onLevelChange(int level) {
 
     }
+
+    @Override
+    public void onKillsChange(int kills) {
+
+    }
 }

@@ -14,6 +14,7 @@ public class GameManager {
     private PacContext pacContext;
     private Thread updatePanelThread = null;
     private boolean gameStarted = false;
+    private int killOffset = 0;
 
     private Logger logger = Logger.getLogger(GameManager.class.getName());
 
@@ -120,20 +121,21 @@ public class GameManager {
         }
     }
 
-    public void startCountdown(Runnable runnable){
+    public void startCountdown(Runnable runnable) {
         gamePanel.setScene(GamePanel.Scene.MESSAGE);
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             Integer offset = 3;
+
             @Override
             public void run() {
-                if(offset>0){
+                if (offset > 0) {
                     gamePanel.setMessage(offset.toString());
                 }
-                if(offset == 0) {
+                if (offset == 0) {
                     gamePanel.setMessage("START");
                 }
-                if(offset < 0){
+                if (offset < 0) {
                     timer.cancel();
                     runnable.run();
                 }
@@ -219,6 +221,13 @@ public class GameManager {
         pacContext.setScore(value);
     }
 
+    public void killBot() {
+        int value = pacContext.getScore() + 600 + 300 * killOffset;
+        pacContext.setScore(value);
+        pacContext.setKills(pacContext.getKills() + 1);
+        killOffset++;
+    }
+
     public void killPlayer() {
         engine.pause();
         int lives = pacContext.getLives();
@@ -244,8 +253,8 @@ public class GameManager {
         }
     }
 
-    private void nextLevel(){
-        pacContext.setLevel(pacContext.getLevel()+1);
+    private void nextLevel() {
+        pacContext.setLevel(pacContext.getLevel() + 1);
         engine.pause();
         removeAllObject();
         try {
@@ -257,10 +266,10 @@ public class GameManager {
         }
     }
 
-    public void checkSweets(){
+    public void checkSweets() {
         List<IWorldObject> sweets = engine.getWorldObjectListByClass(Sweet.class);
         List<IWorldObject> boosts = engine.getWorldObjectListByClass(Boost.class);
-        if(sweets.size() + boosts.size()==0){
+        if (sweets.size() + boosts.size() == 0) {
             nextLevel();
         }
     }

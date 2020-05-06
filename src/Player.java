@@ -21,7 +21,7 @@ public class Player extends Actor implements IRenderObject{
         fontAnimator.setFps(2);
         rearAnimator.setFps(2);
         currentAnimator = sideAnimator;
-        velosity = 300d;
+        velosity = 150d;
     }
 
     @Override

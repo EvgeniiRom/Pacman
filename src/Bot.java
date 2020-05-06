@@ -14,7 +14,6 @@ public class Bot extends Actor implements IRenderObject {
     private int w = 64;
     private int h = 64;
     private double eatDistance = 20d;
-    private double defV = 90d;
 
     private boolean immortal = true;
     private boolean dead = false;
@@ -43,7 +42,7 @@ public class Bot extends Actor implements IRenderObject {
     }
 
     private void updateVelosity() {
-        velosity = defV;
+        velosity = 110d;
         if (!immortal) {
             velosity = 50d;
         }
@@ -61,9 +60,11 @@ public class Bot extends Actor implements IRenderObject {
     @Override
     public void start() {
         super.start();
+        deadlyStartTime = -deadlyTime;
+        spawning = false;
+        spawnStartTime = 0l;
         lastBlockIndex = getBlockIndex();
         preferredDir = Dir.NONE;
-        updateVelosity();
     }
 
     private int bfs(Coord<Integer> startBlock, Coord<Integer> target, boolean[][] used) {
@@ -123,6 +124,7 @@ public class Bot extends Actor implements IRenderObject {
     }
 
     private void death() {
+        pacContext.getGameManager().killBot();
         dead = true;
     }
 
@@ -154,7 +156,9 @@ public class Bot extends Actor implements IRenderObject {
             if (immortal) {
                 gameManager.killPlayer();
             } else {
-                death();
+                if(!dead) {
+                    death();
+                }
             }
         }
         if (dead && gateKey) {
