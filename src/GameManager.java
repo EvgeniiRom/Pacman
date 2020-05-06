@@ -1,3 +1,5 @@
+import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,44 +108,77 @@ public class GameManager {
         try {
             createWorldObjects();
             engine.startObjects();
-            engine.resume();
-            gamePanel.setScene(GamePanel.Scene.GAMING);
+            startCountdown(new Runnable() {
+                @Override
+                public void run() {
+                    engine.resume();
+                    gamePanel.setScene(GamePanel.Scene.GAMING);
+                }
+            });
         } catch (IOException e) {
             logger.info("Create world objects failed: " + e.getMessage());
         }
     }
 
-    public void startGame() {
-        removeAllObject();
-        pacContext.setDefaultValues();
-        try {
-            createWorldObjects();
-            engine.startObjects();
-            if (!gameStarted) {
-                updatePanelThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            while (true) {
-                                Thread.sleep(10);
-                                gamePanel.repaint();
-                            }
-                        } catch (InterruptedException e) {
-                            logger.info("game panel update thread interrupted");
-                        }
-                    }
-                });
-                updatePanelThread.start();
-                engine.start();
-                gameStarted = true;
-                gamePanel.setScene(GamePanel.Scene.GAMING);
-                logger.info("game started");
-            } else {
-                logger.info("game already started");
+    public void startCountdown(Runnable runnable){
+        gamePanel.setScene(GamePanel.Scene.MESSAGE);
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            Integer offset = 3;
+            @Override
+            public void run() {
+                if(offset>0){
+                    gamePanel.setMessage(offset.toString());
+                }
+                if(offset == 0) {
+                    gamePanel.setMessage("START");
+                }
+                if(offset < 0){
+                    timer.cancel();
+                    runnable.run();
+                }
+                offset--;
             }
-        } catch (IOException e) {
-            logger.info("Create world objects failed: " + e.getMessage());
-        }
+        }, 0, 1000);
+    }
+
+
+    public void startGame() {
+        startCountdown(new Runnable() {
+            @Override
+            public void run() {
+                removeAllObject();
+                pacContext.setDefaultValues();
+                try {
+                    createWorldObjects();
+                    engine.startObjects();
+                    if (!gameStarted) {
+                        updatePanelThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    while (true) {
+                                        Thread.sleep(10);
+                                        gamePanel.repaint();
+                                    }
+                                } catch (InterruptedException e) {
+                                    logger.info("game panel update thread interrupted");
+                                }
+                            }
+                        });
+                        updatePanelThread.start();
+                        engine.start();
+                        gameStarted = true;
+                        gamePanel.setScene(GamePanel.Scene.GAMING);
+                        logger.info("game started");
+                    } else {
+                        logger.info("game already started");
+                    }
+                } catch (IOException e) {
+                    logger.info("Create world objects failed: " + e.getMessage());
+                }
+            }
+        });
     }
 
 

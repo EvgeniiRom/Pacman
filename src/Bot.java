@@ -75,7 +75,7 @@ public class Bot extends Actor implements IRenderObject {
             @Override
             public void run() {
                 warning = true;
-                warningStartTime = System.currentTimeMillis();
+                warningStartTime = timeOffset;
             }
         };
         deadlyTimer = new Timer();
@@ -241,9 +241,9 @@ public class Bot extends Actor implements IRenderObject {
         }else{
             currentFrame = mortalAnimator.getCurrentFrame(timeOffset);
             if(warning) {
-                long timeOffset = System.currentTimeMillis() - warningStartTime;
-                if(timeOffset%1000<500) {
-                    currentFrame = mainAnimator.getCurrentFrame(timeOffset);
+                long time = timeOffset - warningStartTime;
+                if(time%1000<500) {
+                    currentFrame = mainAnimator.getCurrentFrame(time);
                 }
             }
         }

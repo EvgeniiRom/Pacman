@@ -10,11 +10,13 @@ public class GamePanel extends JPanel {
     private GameOverForm gameOverForm;
     private MainMenuForm mainMenuForm;
     private PauseForm pauseForm;
+    private MessageForm messageForm;
 
     public enum Scene {
         MAIN_MENU,
         GAMING,
         PAUSE,
+        MESSAGE,
         GAME_OVER;
     }
 
@@ -38,14 +40,20 @@ public class GamePanel extends JPanel {
         mainMenuForm = new MainMenuForm(pacContext);
         pauseForm = new PauseForm(pacContext);
         gameOverForm = new GameOverForm(pacContext);
+        messageForm = new MessageForm();
 
         overlayPanel.add(mainMenuForm.getMainPanel(), Scene.MAIN_MENU.name());
         overlayPanel.add(pauseForm.getMainPanel(), Scene.PAUSE.name());
         overlayPanel.add(gameOverForm.getMainPanel(), Scene.GAME_OVER.name());
+        overlayPanel.add(messageForm.getMainPanel(), Scene.MESSAGE.name());
 
         add(overlayPanel, BorderLayout.CENTER);
 
         overlayLayout.show(overlayPanel, Scene.MAIN_MENU.name());
+    }
+
+    public void setMessage(String text){
+        messageForm.setText(text);
     }
 
     @Override
