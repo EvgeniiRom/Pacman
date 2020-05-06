@@ -42,8 +42,7 @@ public abstract class Actor implements IWorldObject {
         LEFT;
     }
 
-    public Dir getReverseDir(Dir dir)
-    {
+    public Dir getReverseDir(Dir dir) {
         switch (dir) {
             case UP:
                 return Dir.DOWN;
@@ -112,8 +111,14 @@ public abstract class Actor implements IWorldObject {
 
     protected Coord<Double> getNextCoord() {
         Coord<Integer> blockIndex = getNextBlockIndex(preferredDir, getBlockIndex());
-        int blockSize = pacContext.getBlockSize();
         int block = pacContext.getPacField().getBlock(blockIndex);
+        if (block == 1 || block == 2 && !gateKey) {
+            blockIndex = getNextBlockIndex(dir, getBlockIndex());
+        } else {
+            dir = preferredDir;
+        }
+        block = pacContext.getPacField().getBlock(blockIndex);
+        int blockSize = pacContext.getBlockSize();
         if (block == 0 || block == 2 && gateKey) {
             return new Coord<Double>(blockSize * (blockIndex.x + 0.5d), blockSize * (blockIndex.y + 0.5d));
         }
@@ -121,31 +126,31 @@ public abstract class Actor implements IWorldObject {
     }
 
 
-    private void updateCurrentCoord(double donePercent){
+    private void updateCurrentCoord(double donePercent) {
         PacField pacField = pacContext.getPacField();
         int blockSize = pacContext.getBlockSize();
-        double width = pacField.getWidth()*blockSize;
-        double height = pacField.getHeight()*blockSize;
+        double width = pacField.getWidth() * blockSize;
+        double height = pacField.getHeight() * blockSize;
 
         currentCoord.x = startCoord.x + (targetCoord.x - startCoord.x) * donePercent;
         currentCoord.y = startCoord.y + (targetCoord.y - startCoord.y) * donePercent;
 
-        if(currentCoord.x < 0){
+        if (currentCoord.x < 0) {
             currentCoord.x += width;
             startCoord.x += width;
             targetCoord.x += width;
         }
-        if(currentCoord.x >= width){
+        if (currentCoord.x >= width) {
             currentCoord.x -= width;
             startCoord.x -= width;
             targetCoord.x -= width;
         }
-        if(currentCoord.y < 0){
+        if (currentCoord.y < 0) {
             currentCoord.y += height;
             startCoord.y += height;
             targetCoord.y += height;
         }
-        if(currentCoord.y >= height){
+        if (currentCoord.y >= height) {
             currentCoord.y -= height;
             startCoord.y -= height;
             targetCoord.y -= height;
@@ -161,7 +166,7 @@ public abstract class Actor implements IWorldObject {
 
         updateCurrentCoord(donePercent);
 
-        if(preferredDir!=Dir.NONE && preferredDir == getReverseDir(dir)){
+        if (preferredDir != Dir.NONE && preferredDir == getReverseDir(dir)) {
             Coord<Double> temp = targetCoord;
             targetCoord = startCoord;
             startCoord = temp;
@@ -174,10 +179,9 @@ public abstract class Actor implements IWorldObject {
             startCoord = targetCoord.clone();
             currentCoord = targetCoord.clone();
             targetCoord = getNextCoord();
-            if(targetCoord.equals(currentCoord)){
+            if (targetCoord.equals(currentCoord)) {
                 preferredDir = Dir.NONE;
             }
-            dir = preferredDir;
         }
     }
 
