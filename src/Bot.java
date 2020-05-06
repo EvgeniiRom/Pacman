@@ -22,7 +22,12 @@ public class Bot extends Actor implements IRenderObject {
     private BufferedImage deadImage;
     private long timeOffset = 0l;
     private int zIndex = 100;
-
+    private Timer deadlyTimer = null;
+    private Timer warningTimer = null;
+    private long deadlyTime = 10000l;
+    private long warningTime = 7000l;
+    private long warningStartTime = 0l;
+    boolean warning = false;
 
     public Bot(PacContext pacContext, String id) throws IOException {
         super(pacContext, id);
@@ -42,9 +47,41 @@ public class Bot extends Actor implements IRenderObject {
         }
     }
 
-    public void setImmortal(boolean immortal) {
-        this.immortal = immortal;
-        updateVelosity();
+    public void deadly() {
+        if(!dead){
+            immortal = false;
+            warning = false;
+            updateVelosity();
+            updateDeadlyTimer();
+        }
+    }
+
+    private void updateDeadlyTimer() {
+        if(deadlyTimer != null){
+            deadlyTimer.cancel();
+        }
+        if(warningTimer != null){
+            warningTimer.cancel();
+        }
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                immortal = true;
+                warning = false;
+                updateVelosity();
+            }
+        };
+        TimerTask warningTask = new TimerTask() {
+            @Override
+            public void run() {
+                warning = true;
+                warningStartTime = System.currentTimeMillis();
+            }
+        };
+        deadlyTimer = new Timer();
+        deadlyTimer.schedule(timerTask, deadlyTime);
+        warningTimer = new Timer();
+        warningTimer.schedule(warningTask, warningTime);
     }
 
     @Override
@@ -101,11 +138,6 @@ public class Bot extends Actor implements IRenderObject {
             return possibleDirList.get(Math.abs(Randomizer.getInstance().getInteger()) % size);
         }
         return Dir.NONE;
-    }
-
-    private Dir getRandomDir() {
-        List<Dir> possibleDirList = getPossibleDirList(getBlockIndex());
-        return getRandomDir(possibleDirList);
     }
 
     boolean meetPlayer() {
@@ -194,19 +226,8 @@ public class Bot extends Actor implements IRenderObject {
         }
     }
 
-    private void getCurrentFrame(){
-
-    }
-
     @Override
     public void render(Graphics2D g) {
-        g.setColor(Color.BLUE);
-        if (!immortal) {
-            g.setColor(Color.MAGENTA);
-        }
-        if (dead) {
-            g.setColor(Color.WHITE);
-        }
         AffineTransform transform = g.getTransform();
         Coord<Double> currentCoord = getCurrentCoord();
         g.translate(currentCoord.x, currentCoord.y);
@@ -219,6 +240,12 @@ public class Bot extends Actor implements IRenderObject {
             currentFrame = mainAnimator.getCurrentFrame(timeOffset);
         }else{
             currentFrame = mortalAnimator.getCurrentFrame(timeOffset);
+            if(warning) {
+                long timeOffset = System.currentTimeMillis() - warningStartTime;
+                if(timeOffset%1000<500) {
+                    currentFrame = mainAnimator.getCurrentFrame(timeOffset);
+                }
+            }
         }
         if(dead){
             currentFrame = deadImage;

@@ -12,7 +12,6 @@ public class GameManager {
     private PacContext pacContext;
     private Thread updatePanelThread = null;
     private boolean gameStarted = false;
-    private Timer boostTimer = null;
 
     private Logger logger = Logger.getLogger(GameManager.class.getName());
 
@@ -202,33 +201,12 @@ public class GameManager {
         gamePanel.setScene(GamePanel.Scene.GAME_OVER);
     }
 
-    private void createBoostTimer() {
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                boostTimer = null;
-                List<IWorldObject> bots = engine.getWorldObjectListByClass(Bot.class);
-                for (IWorldObject object : bots) {
-                    Bot bot = (Bot) object;
-                    bot.setImmortal(true);
-                }
-            }
-        };
-        boostTimer = new Timer();
-        boostTimer.schedule(timerTask, 5000);
-    }
-
     public void boost() {
-        if (boostTimer == null) {
-            List<IWorldObject> bots = engine.getWorldObjectListByClass(Bot.class);
-            for (IWorldObject object : bots) {
-                Bot bot = (Bot) object;
-                bot.setImmortal(false);
-            }
-        } else {
-            boostTimer.cancel();
+        List<IWorldObject> bots = engine.getWorldObjectListByClass(Bot.class);
+        for (IWorldObject object : bots) {
+            Bot bot = (Bot) object;
+            bot.deadly();
         }
-        createBoostTimer();
     }
 
     private void nextLevel(){
