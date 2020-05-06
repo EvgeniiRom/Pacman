@@ -15,19 +15,24 @@ public class Bot extends Actor implements IRenderObject {
     private int h = 64;
     private double eatDistance = 20d;
     private double defV = 90d;
+
     private boolean immortal = true;
     private boolean dead = false;
+    private boolean warning = false;
+
     private Animator mainAnimator;
     private Animator mortalAnimator;
     private BufferedImage deadImage;
     private long timeOffset = 0l;
     private int zIndex = 100;
-    private Timer deadlyTimer = null;
-    private Timer warningTimer = null;
+
     private long deadlyTime = 10000l;
-    private long warningTime = 7000l;
-    private long warningStartTime = 0l;
-    boolean warning = false;
+    private long spawnTime = 5000l;
+    private long warningStartTime = 7000l;
+
+    private long deadlyStartTime = -deadlyTime;
+    private boolean spawning = false;
+    private long spawnStartTime = 0l;
 
     public Bot(PacContext pacContext, String id) throws IOException {
         super(pacContext, id);
@@ -37,51 +42,20 @@ public class Bot extends Actor implements IRenderObject {
         deadImage = ImageIO.read(new File("images/bot/dead.png"));
     }
 
-    private void updateVelosity(){
+    private void updateVelosity() {
         velosity = defV;
-        if(!immortal){
+        if (!immortal) {
             velosity = 50d;
         }
-        if(dead){
+        if (dead) {
             velosity = 200d;
         }
     }
 
     public void deadly() {
-        if(!dead){
-            immortal = false;
-            warning = false;
-            updateVelosity();
-            updateDeadlyTimer();
+        if (!dead) {
+            deadlyStartTime = timeOffset;
         }
-    }
-
-    private void updateDeadlyTimer() {
-        if(deadlyTimer != null){
-            deadlyTimer.cancel();
-        }
-        if(warningTimer != null){
-            warningTimer.cancel();
-        }
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                immortal = true;
-                warning = false;
-                updateVelosity();
-            }
-        };
-        TimerTask warningTask = new TimerTask() {
-            @Override
-            public void run() {
-                warning = true;
-                warningStartTime = timeOffset;
-            }
-        };
-        deadlyTimer = new Timer();
-        deadlyTimer.schedule(timerTask, deadlyTime);
-        warningTimer = new Timer();
-        warningTimer.schedule(warningTask, warningTime);
     }
 
     @Override
@@ -110,7 +84,7 @@ public class Bot extends Actor implements IRenderObject {
                 for (Dir nextDir : dirs) {
                     Coord<Integer> nextBlockIndex = getNextBlockIndex(nextDir, blockIndex);
                     int nextBlock = 1;
-                    if(pacContext.getPacField().validBlockIndex(nextBlockIndex)) {
+                    if (pacContext.getPacField().validBlockIndex(nextBlockIndex)) {
                         nextBlock = pacContext.getPacField().getBlock(nextBlockIndex);
                     }
                     if (!nextBlockIndex.equals(blockIndex) &&
@@ -150,21 +124,20 @@ public class Bot extends Actor implements IRenderObject {
 
     private void death() {
         dead = true;
-        updateVelosity();
     }
 
-    public void initRespawn() {
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
+    private void updateFlags() {
+        long deadlyOffset = timeOffset - deadlyStartTime;
+        immortal = deadlyOffset > deadlyTime;
+        if (spawning) {
+            if (timeOffset - spawnStartTime > spawnTime) {
                 dead = false;
-                immortal = true;
                 gateKey = true;
-                updateVelosity();
+                spawning = false;
+                deadlyStartTime = -deadlyTime;
             }
-        };
-        Timer timer = new Timer();
-        timer.schedule(timerTask, 5000);
+        }
+        warning = !immortal && deadlyOffset > warningStartTime && (deadlyOffset - warningStartTime) % 1000 < 500;
     }
 
     @Override
@@ -172,7 +145,9 @@ public class Bot extends Actor implements IRenderObject {
         if (time == 0) {
             return;
         }
-        timeOffset+=time;
+        timeOffset += time;
+        updateFlags();
+        updateVelosity();
         GameManager gameManager = pacContext.getGameManager();
         Coord<Integer> blockIndex = getBlockIndex();
         if (meetPlayer()) {
@@ -204,8 +179,9 @@ public class Bot extends Actor implements IRenderObject {
                     result = possibleDir;
                 }
             }
-            if (minPath == 0) {
-                initRespawn();
+            if (minPath == 0 && !spawning) {
+                spawnStartTime = timeOffset;
+                spawning = true;
                 gateKey = false;
             }
             setPreferredDir(result);
@@ -231,27 +207,24 @@ public class Bot extends Actor implements IRenderObject {
         AffineTransform transform = g.getTransform();
         Coord<Double> currentCoord = getCurrentCoord();
         g.translate(currentCoord.x, currentCoord.y);
-        if(dir.equals(Dir.LEFT) || dir.equals(Dir.DOWN)) {
+        if (dir.equals(Dir.LEFT) || dir.equals(Dir.DOWN)) {
             g.transform(new AffineTransform(-1d, 0d, 0d, 1d, 0d, 0d));
         }
 
         BufferedImage currentFrame = null;
-        if(immortal){
+        if (immortal) {
             currentFrame = mainAnimator.getCurrentFrame(timeOffset);
-        }else{
+        } else {
             currentFrame = mortalAnimator.getCurrentFrame(timeOffset);
-            if(warning) {
-                long time = timeOffset - warningStartTime;
-                if(time%1000<500) {
-                    currentFrame = mainAnimator.getCurrentFrame(time);
-                }
+            if (warning) {
+                currentFrame = mainAnimator.getCurrentFrame(timeOffset);
             }
         }
-        if(dead){
+        if (dead) {
             currentFrame = deadImage;
         }
 
-        g.drawImage(currentFrame,-w / 2, -h / 2, w, h, null);
+        g.drawImage(currentFrame, -w / 2, -h / 2, w, h, null);
         g.setTransform(transform);
     }
 
