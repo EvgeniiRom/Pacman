@@ -47,6 +47,7 @@ public class Sweet implements IWorldObject, IRenderObject {
                 @Override
                 public void run() {
                     gameManager.removeObject(id);
+                    gameManager.checkSweets();
                 }
             }).start();
         }

@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-public class GameOverForm implements GameListener {
+public class GameOverForm implements ContextListener {
     private JButton restartButton;
     private JPanel mainPanel;
     private JLabel scoreLabel;
@@ -11,7 +11,7 @@ public class GameOverForm implements GameListener {
     public GameOverForm(PacContext pacContext) {
         this.pacContext = pacContext;
         mainPanel.setOpaque(false);
-        pacContext.getGameManager().addGameListener(this);
+        pacContext.getGameManager().getPacContext().addContextListener(this);
         restartButton.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -31,6 +31,11 @@ public class GameOverForm implements GameListener {
 
     @Override
     public void onLiveChange(int lives) {
+
+    }
+
+    @Override
+    public void onLevelChange(int level) {
 
     }
 }

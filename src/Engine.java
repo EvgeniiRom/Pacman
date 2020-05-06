@@ -31,11 +31,9 @@ public class Engine {
     }
 
     private synchronized void worldTick(long time) {
-        synchronized (worldObjectsMap) {
-            Collection<IWorldObject> worldObjects = worldObjectsMap.values();
-            for (IWorldObject iWorldObject : worldObjects) {
-                iWorldObject.update(time);
-            }
+        Collection<IWorldObject> worldObjects = worldObjectsMap.values();
+        for (IWorldObject iWorldObject : worldObjects) {
+            iWorldObject.update(time);
         }
     }
 
@@ -63,12 +61,14 @@ public class Engine {
                     long lastUpdate = System.currentTimeMillis();
                     while (true) {
                         Thread.sleep(worldUpdateDelay);
-                        long currentTime = System.currentTimeMillis();
-                        if(timeScale>0.001) {
-                            int time = (int) ((currentTime - lastUpdate) * timeScale);
-                            worldTick(time);
+                        synchronized (worldObjectsMap) {
+                            long currentTime = System.currentTimeMillis();
+                            if (timeScale > 0.001) {
+                                int time = (int) ((currentTime - lastUpdate) * timeScale);
+                                worldTick(time);
+                            }
+                            lastUpdate = currentTime;
                         }
-                        lastUpdate = currentTime;
                     }
                 } catch (InterruptedException e) {
                     logger.info("engine update thread interrupted");
@@ -80,11 +80,15 @@ public class Engine {
     }
 
     public void pause(){
-        timeScale = 0d;
+        synchronized (worldObjectsMap){
+            timeScale = 0d;
+        }
     }
 
     public void resume(){
-        timeScale = 1d;
+        synchronized (worldObjectsMap) {
+            timeScale = 1d;
+        }
     }
 
     public void stop() {

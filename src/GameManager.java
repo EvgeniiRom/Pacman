@@ -13,7 +13,6 @@ public class GameManager {
     private Thread updatePanelThread = null;
     private boolean gameStarted = false;
     private Timer boostTimer = null;
-    private List<GameListener> listenerList = new ArrayList<>();
 
     private Logger logger = Logger.getLogger(GameManager.class.getName());
 
@@ -101,28 +100,10 @@ public class GameManager {
         return pacContext;
     }
 
-    public void addGameListener(GameListener listener) {
-        listenerList.add(listener);
-    }
-
-    private void fireScore() {
-        for (GameListener gameListener : listenerList) {
-            gameListener.onScoreChange(pacContext.getScore());
-        }
-    }
-
-    private void fireLives() {
-        for (GameListener gameListener : listenerList) {
-            gameListener.onLiveChange(pacContext.getLives());
-        }
-    }
-
     public void restartGame() {
         engine.pause();
         removeAllObject();
         pacContext.setDefaultValues();
-        fireLives();
-        fireScore();
         try {
             createWorldObjects();
             engine.startObjects();
@@ -136,8 +117,6 @@ public class GameManager {
     public void startGame() {
         removeAllObject();
         pacContext.setDefaultValues();
-        fireLives();
-        fireScore();
         try {
             createWorldObjects();
             engine.startObjects();
@@ -204,7 +183,6 @@ public class GameManager {
     public void incrementScore(int score) {
         int value = pacContext.getScore() + score;
         pacContext.setScore(value);
-        fireScore();
     }
 
     public void killPlayer() {
@@ -212,7 +190,6 @@ public class GameManager {
         int lives = pacContext.getLives();
         lives--;
         pacContext.setLives(lives);
-        fireLives();
         if (lives == 0) {
             gameOver();
         } else {
@@ -252,5 +229,26 @@ public class GameManager {
             boostTimer.cancel();
         }
         createBoostTimer();
+    }
+
+    private void nextLevel(){
+        pacContext.setLevel(pacContext.getLevel()+1);
+        engine.pause();
+        removeAllObject();
+        try {
+            createWorldObjects();
+            engine.startObjects();
+            engine.resume();
+        } catch (IOException e) {
+            logger.info(e.getMessage());
+        }
+    }
+
+    public void checkSweets(){
+        List<IWorldObject> sweets = engine.getWorldObjectListByClass(Sweet.class);
+        List<IWorldObject> boosts = engine.getWorldObjectListByClass(Boost.class);
+        if(sweets.size() + boosts.size()==0){
+            nextLevel();
+        }
     }
 }

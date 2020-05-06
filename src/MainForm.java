@@ -4,11 +4,12 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-public class MainForm extends JFrame implements GameListener{
+public class MainForm extends JFrame implements ContextListener {
     private JPanel contentPane;
     private JLabel scoreLabel;
     private JLabel livesLabel;
     private JCheckBox fakeFocusableElement;
+    private JLabel levelLabel;
 
     private GameManager gameManager;
     private Logger logger = Logger.getLogger(MainForm.class.getName());
@@ -27,7 +28,7 @@ public class MainForm extends JFrame implements GameListener{
         setContentPane(contentPane);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameManager = new GameManager();
-        gameManager.addGameListener(this);
+        gameManager.getPacContext().addContextListener(this);
         PacContext pacContext = gameManager.getPacContext();
         scoreLabel.setText(Integer.toString(pacContext.getScore()));
         livesLabel.setText(Integer.toString(pacContext.getLives()));
@@ -101,6 +102,11 @@ public class MainForm extends JFrame implements GameListener{
     @Override
     public void onLiveChange(int lives) {
         livesLabel.setText(Integer.toString(lives));
+    }
+
+    @Override
+    public void onLevelChange(int level) {
+        levelLabel.setText(Integer.toString(level));
     }
 
     private void createUIComponents() {

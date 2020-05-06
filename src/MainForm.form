@@ -7,7 +7,7 @@
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="9a176" layout-manager="GridLayoutManager" row-count="1" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="9a176" layout-manager="GridLayoutManager" row-count="2" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="5" left="10" bottom="5" right="10"/>
         <constraints border-constraint="North"/>
         <properties>
@@ -15,31 +15,11 @@
         </properties>
         <border type="none"/>
         <children>
-          <component id="313c6" class="javax.swing.JLabel">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <font size="22"/>
-              <foreground color="-16735788"/>
-              <text value="Score: "/>
-            </properties>
-          </component>
           <hspacer id="8df4d">
             <constraints>
               <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
           </hspacer>
-          <component id="18b73" class="javax.swing.JLabel" binding="scoreLabel">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <font size="22"/>
-              <foreground color="-16735788"/>
-              <text value="0"/>
-            </properties>
-          </component>
           <component id="88168" class="javax.swing.JLabel" binding="livesLabel">
             <constraints>
               <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -68,6 +48,46 @@
               <background color="-16777216"/>
               <foreground color="-16777216"/>
               <text value=""/>
+            </properties>
+          </component>
+          <component id="b9bba" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font size="22"/>
+              <foreground color="-16735788"/>
+              <text value="Level: "/>
+            </properties>
+          </component>
+          <component id="87e10" class="javax.swing.JLabel" binding="levelLabel">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font size="22"/>
+              <foreground color="-16735788"/>
+              <text value="1"/>
+            </properties>
+          </component>
+          <component id="313c6" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font size="22"/>
+              <foreground color="-16735788"/>
+              <text value="Score: "/>
+            </properties>
+          </component>
+          <component id="18b73" class="javax.swing.JLabel" binding="scoreLabel">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <font size="22"/>
+              <foreground color="-16735788"/>
+              <text value="0"/>
             </properties>
           </component>
         </children>
